@@ -17,13 +17,6 @@ class WeckterBackstoryGenerator(toga.App):
         font_path = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Regular.ttf')
         font_path_bold = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Bold.ttf')
 
-        self.current_state = {
-            'allyenemy': '',
-            'category': '',
-            'description': ''
-        }
-
-
         toga.Font.register("NotoSansMono", font_path)
         toga.Font.register("NotoSansMono", font_path_bold, weight=BOLD)
         custom_font = toga.Font("NotoSansMono", 14, weight=BOLD)
@@ -56,9 +49,7 @@ class WeckterBackstoryGenerator(toga.App):
 
         description_labels = {}
         selected_sentences = "No features selected."
-        selected_sentences_list = []
-        self.temperment_selected = ""
-
+        self.temperment_selected = None
 
         def wrap_text(text, max_width):
             words = text.split(' ')
@@ -95,31 +86,14 @@ class WeckterBackstoryGenerator(toga.App):
             is_enemy = self.ally_enemy_toggle.value if self.ally_enemy_toggle else False
             print(f"is_enemy: {is_enemy}")
 
-            # Update current_state dictionary
-            self.current_state['allyenemy'] = 'Enemy' if is_enemy else 'Ally'
-
-            # Initialize a dict to hold active categories and their corresponding descriptions
-            self.current_state['active_categories'] = {}
-
-            # Update the descriptions for all, irrespective of their state
             for category, sub_categories_and_rolls in self.data['AllyEnemyTables'].items():
                 sub_categories = {key: val for key, val in sub_categories_and_rolls.items() if key != 'rolls'}
-
+                #sub_categories = sub_categories_and_rolls[1]
                 for dice_roll, data in sub_categories.items():
                     choices, description = data['choices'], data['description']
                     replaced_description = description.replace('{{temperment}}', choices[1] if is_enemy else choices[0])
                     wrapped_description = wrap_text(replaced_description, 75)
-
-                    # Update the label's text regardless of its switch state
                     description_labels[category][dice_roll].text = wrapped_description
-
-                    # Only store it in the current_state if it's selected (switch is on)
-                    if self.switch_states.get(category, {}).get(dice_roll, False):
-                        # Update the current_state dictionary
-                        if category not in self.current_state['active_categories']:
-                            self.current_state['active_categories'][category] = []
-                        self.current_state['active_categories'][category].append(wrapped_description)
-
             self.update_selected_sentences()
 
         self.is_enemy = False
@@ -297,55 +271,42 @@ class WeckterBackstoryGenerator(toga.App):
                 if should_be_on != self.switch_states[category][roll_value]:
                     switch.toggle()
                     self.switch_states[category][roll_value] = should_be_on
-
+            self.update_selected_sentences()
 
         return _inner_roll
 
-
     def update_selected_sentences(self):
-        """
-        Update the {selected_sentences} variable with selected sentence data.
-        """
+        print("update_selected_sentences is called!")
+        # Clear out existing selected_sentences
+        self.selected_sentences = {}
 
-        def wrap_text(text, max_width):
-            words = text.split(' ')
-            lines = []
-            current_line = []
+        sentences = {}
+        for category, switch_state in self.switch_states.items():
+            num_rolls = self.data['AllyEnemyTables'][category].get('rolls', 1)
+            selected_descriptions = []
+            for dice_roll, is_selected in switch_state.items():
+                if is_selected:
+                    description_data = self.data['AllyEnemyTables'][category][dice_roll]
+                    description = description_data['description']
+                    choices = description_data.get('choices', [])
 
-            for word in words:
-                if len(' '.join(current_line) + ' ' + word) > max_width:
-                    lines.append(' '.join(current_line))
-                    current_line = [word]
-                else:
-                    current_line.append(word)
+                    # Replace temperament placeholder if available
+                    if choices:
+                        replaced_description = description.replace('{{temperment}}', choices[1] if self.is_enemy else choices[0])
+                        selected_descriptions.append(replaced_description)
+                    else:
+                        selected_descriptions.append(description)
 
-            lines.append(' '.join(current_line))
-            return '\n'.join(lines)
+            if num_rolls > 1:
+                sentences[category] = ", ".join(selected_descriptions)
+            elif selected_descriptions:
+                sentences[category] = selected_descriptions[0]
 
-        selected_sentences_list = []
-        is_enemy = self.ally_enemy_toggle.value if hasattr(self, 'ally_enemy_toggle') else False
-        if not hasattr(self, 'temperment_selected'):
-            print("Warning: temperment_selected not initialized.")
-            return
+        final_sentences = []
+        for category, desc in sentences.items():
+            final_sentences.append(f"{category}:\n\t {desc}\n")
 
-        if not hasattr(self, 'data') or 'AllyEnemyTables' not in self.data:
-            print("Warning: data or AllyEnemyTables not initialized.")
-            return
-
-        for category, sub_categories_and_rolls in self.data['AllyEnemyTables'].items():
-            sub_categories = {key: val for key, val in sub_categories_and_rolls.items() if key != 'rolls'}
-            for dice_roll, data in sub_categories.items():
-                choices, description = data['choices'], data['description']
-                replaced_description = description.replace('{{temperment}}', choices[1] if is_enemy else choices[0])
-                wrapped_description = wrap_text(replaced_description, 75)
-                selected_sentences_list.append(f"{category}:\n\t{wrapped_description}")
-
-        self.selected_sentences = "\n".join(selected_sentences_list)
-
-        if hasattr(self, 'selected_sentences_label'):
-            self.selected_sentences_label.text = self.selected_sentences if selected_sentences_list else "No features selected."
-        else:
-            print("Warning: selected_sentences_label not initialized.")
+        self.selected_sentences_label.text = "\n".join(final_sentences)
 
 
 def main():
