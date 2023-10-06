@@ -3,308 +3,308 @@ AllyEnemyTables:
     rolls: 1
     "01-65":
       choices: ["Ally", "Enemy"]
-      description: "{{temperment}} is of same race as Character."
+      description: "{{temperament}} is of same race as Character."
     "66-85":
       choices: ["Ally", "Enemy"]
-      description: "{{temperment}} is of race most common to area."
+      description: "{{temperament}} is of race most common to area."
     "86-95":
       choices: ["Ally", "Enemy"]
-      description: "{{temperment}} is of a different, goodly race."
+      description: "{{temperament}} is of a different, goodly race."
     "96-100":
       choices: ["Ally", "Enemy"]
-      description: "{{temperment}} is of a different, bestial race."
+      description: "{{temperament}} is of a different, bestial race."
   "Strength of Relationship":
     rolls: 1
     "01-50":
       choices: ["Ally is a casual friend", "Enemy has a mild hatred"]
-      description: "{{temperment}}."
+      description: "{{temperament}}."
     "51-90":
       choices: ["Ally is a good friend", "Enemy has a strong hatred"]
-      description: "{{temperment}}."
+      description: "{{temperament}}."
     "91-100":
       choices: ["Ally is a lifelong friend", "Enemy has an overwhelming hatred"]
-      description: "{{temperment}}."
+      description: "{{temperament}}."
   "Length of Acquaintance":
     rolls: 1
     "01-38":
       choices: ["ally", "enemy"]
-      description: "Have known {{temperment}} almost your whole life."
+      description: "Have known {{temperament}} almost your whole life."
     "39-66":
       choices: ["ally", "enemy"]
-      description: "Have known {{temperment}} for many years."
+      description: "Have known {{temperament}} for many years."
     "67-84":
       choices: ["ally", "enemy"]
-      description: "Have known {{temperment}} for a few years."
+      description: "Have known {{temperament}} for a few years."
     "85-100":
       choices: ["ally", "enemy"]
-      description: "Have known {{temperment}} only briefly."
+      description: "Have known {{temperament}} only briefly."
   "Relative Influence":
     rolls: 1
     "01-12":
       choices: ["Ally", "Enemy"]
-      description: "{{temperment}} wields considerable influence for someone of their position."
+      description: "{{temperament}} wields considerable influence for someone of their position."
     "13-34":
       choices: ["Ally", "Enemy"]
-      description: "{{temperment}} has some influence."
+      description: "{{temperament}} has some influence."
     "35-66":
       choices: ["Ally", "Enemy"]
-      description: "{{temperment}} has no more than typical influence."
+      description: "{{temperament}} has no more than typical influence."
     "67-88":
       choices: ["Ally", "Enemy"]
-      description: "{{temperment}} has little influence."
+      description: "{{temperament}} has little influence."
     "89-100":
       choices: ["Ally", "Enemy"]
-      description: "{{temperment}} has but the influence of their own two hands."
+      description: "{{temperament}} has but the influence of their own two hands."
   "Described as (kind to allies/cruel to foes)":
     rolls: 2
     "01-03":
       choices: ["", ""]
-      description: "{{temperment}}Honorable"
+      description: "{{temperament}}Honorable"
     "04-06":
       choices: ["", ""]
-      description: "{{temperment}}Cunning"
+      description: "{{temperament}}Cunning"
     "07-09":
       choices: ["", ""]
-      description: "{{temperment}}Avaricious"
+      description: "{{temperament}}Avaricious"
     "10-12":
       choices: ["", ""]
-      description: "{{temperment}}Generous"
+      description: "{{temperament}}Generous"
     "13-15":
       choices: ["", ""]
-      description: "{{temperment}}Kind hearted"
+      description: "{{temperament}}Kind hearted"
     "16-17":
       choices: ["", ""]
-      description: "{{temperment}}Devious"
+      description: "{{temperament}}Devious"
     "18-20":
       choices: ["", ""]
-      description: "{{temperment}}Cruel"
+      description: "{{temperament}}Cruel"
     "21-23":
       choices: ["", ""]
-      description: "{{temperment}}Treacherous"
+      description: "{{temperament}}Treacherous"
     "24-26":
       choices: ["", ""]
-      description: "{{temperment}}Pious"
+      description: "{{temperament}}Pious"
     "27-29":
       choices: ["", ""]
-      description: "{{temperment}}Shrewd"
+      description: "{{temperament}}Shrewd"
     "30-32":
       choices: ["", ""]
-      description: "{{temperment}}Humble"
+      description: "{{temperament}}Humble"
     "33-35":
       choices: ["", ""]
-      description: "{{temperment}}Proud"
+      description: "{{temperament}}Proud"
     "36-38":
       choices: ["", ""]
-      description: "{{temperment}}Arrogant"
+      description: "{{temperament}}Arrogant"
     "39-41":
       choices: ["", ""]
-      description: "{{temperment}}Rude"
+      description: "{{temperament}}Rude"
     "42-44":
       choices: ["", ""]
-      description: "{{temperment}}Polite"
+      description: "{{temperament}}Polite"
     "45-47":
       choices: ["", ""]
-      description: "{{temperment}}Gregarious"
+      description: "{{temperament}}Gregarious"
     "48-50":
       choices: ["", ""]
-      description: "{{temperment}}Pensive"
+      description: "{{temperament}}Pensive"
     "51-53":
       choices: ["", ""]
-      description: "{{temperment}}Methodical"
+      description: "{{temperament}}Methodical"
     "54-56":
       choices: ["", ""]
-      description: "{{temperment}}Impetuous"
+      description: "{{temperament}}Impetuous"
     "57-59":
       choices: ["", ""]
-      description: "{{temperment}}Amorous"
+      description: "{{temperament}}Amorous"
     "60-62":
       choices: ["", ""]
-      description: "{{temperment}}Dimwitted"
+      description: "{{temperament}}Dimwitted"
     "63-65":
       choices: ["", ""]
-      description: "{{temperment}}Intelligent"
+      description: "{{temperament}}Intelligent"
     "66-68":
       choices: ["", ""]
-      description: "{{temperment}}Insightful"
+      description: "{{temperament}}Insightful"
     "69-71":
       choices: ["", ""]
-      description: "{{temperment}}Ambitious"
+      description: "{{temperament}}Ambitious"
     "72-73":
       choices: ["", ""]
-      description: "{{temperment}}Free-spirited"
+      description: "{{temperament}}Free-spirited"
     "74-76":
       choices: ["", ""]
-      description: "{{temperment}}Courageous"
+      description: "{{temperament}}Courageous"
     "77-79":
       choices: ["", ""]
-      description: "{{temperment}}Charismatic"
+      description: "{{temperament}}Charismatic"
     "80-82":
       choices: ["", ""]
-      description: "{{temperment}}Cynical"
+      description: "{{temperament}}Cynical"
     "83-85":
       choices: ["", ""]
-      description: "{{temperment}}Direct"
+      description: "{{temperament}}Direct"
     "86-88":
       choices: ["", ""]
-      description: "{{temperment}}Eccentric or absent-minded"
+      description: "{{temperament}}Eccentric or absent-minded"
     "89-91":
       choices: ["", ""]
-      description: "{{temperment}}Jovial"
+      description: "{{temperament}}Jovial"
     "92-94":
       choices: ["", ""]
-      description: "{{temperment}}Unscrupulous"
+      description: "{{temperament}}Unscrupulous"
     "95-97":
       choices: ["", ""]
-      description: "{{temperment}}Vengeful"
+      description: "{{temperament}}Vengeful"
     "98-100":
       choices: ["", ""]
-      description: "{{temperment}}Witty"
+      description: "{{temperament}}Witty"
   "Profession":
     rolls: 1
     "01-03":
       choices: ["", ""]
-      description: "{{temperment}}Cleric/Faith healer."
+      description: "{{temperament}}Cleric/Faith healer."
     "04-06":
       choices: ["", ""]
-      description: "{{temperment}}Adventurer."
+      description: "{{temperament}}Adventurer."
     "07-09":
       choices: ["", ""]
-      description: "{{temperment}}Enchanter."
+      description: "{{temperament}}Enchanter."
     "10-12":
       choices: ["", ""]
-      description: "{{temperment}}Elementalist."
+      description: "{{temperament}}Elementalist."
     "13-15":
       choices: ["", ""]
-      description: "{{temperment}}Necromancer."
+      description: "{{temperament}}Necromancer."
     "16-18":
       choices: ["", ""]
-      description: "{{temperment}}Illusionist."
+      description: "{{temperament}}Illusionist."
     "19-21":
       choices: ["", ""]
-      description: "{{temperment}}Shadowmage."
+      description: "{{temperament}}Shadowmage."
     "22-24":
       choices: ["", ""]
-      description: "{{temperment}}Mentalist."
+      description: "{{temperament}}Mentalist."
     "25-26":
       choices: ["", ""]
-      description: "{{temperment}}Witch/Warlock."
+      description: "{{temperament}}Witch/Warlock."
     "27-29":
       choices: ["", ""]
-      description: "{{temperment}}Merchant."
+      description: "{{temperament}}Merchant."
     "30-32":
       choices: ["", ""]
-      description: "{{temperment}}Tinker."
+      description: "{{temperament}}Tinker."
     "33-35":
       choices: ["", ""]
-      description: "{{temperment}}Factor or Steward."
+      description: "{{temperament}}Factor or Steward."
     "36-38":
       choices: ["", ""]
-      description: "{{temperment}}Hunter."
+      description: "{{temperament}}Hunter."
     "39-41":
       choices: ["", ""]
-      description: "{{temperment}}Regional Agriculturist (farmer, fisher, herdsman, etc.)."
+      description: "{{temperament}}Regional Agriculturist (farmer, fisher, herdsman, etc.)."
     "42-44":
       choices: ["", ""]
-      description: "{{temperment}}Manual Laborer (miner, dockhand, porter)."
+      description: "{{temperament}}Manual Laborer (miner, dockhand, porter)."
     "45-47":
       choices: ["", ""]
-      description: "{{temperment}}Clerk or Scribe."
+      description: "{{temperament}}Clerk or Scribe."
     "48-50":
       choices: ["", ""]
-      description: "{{temperment}}Noble."
+      description: "{{temperament}}Noble."
     "51-53":
       choices: ["", ""]
-      description: "{{temperment}}Doctor or Herbalist."
+      description: "{{temperament}}Doctor or Herbalist."
     "54-56":
       choices: ["", ""]
-      description: "{{temperment}}Thief or Bandit."
+      description: "{{temperament}}Thief or Bandit."
     "57-59":
       choices: ["", ""]
-      description: "{{temperment}}Personal Guard."
+      description: "{{temperament}}Personal Guard."
     "60-62":
       choices: ["", ""]
-      description: "{{temperment}}Soldier."
+      description: "{{temperament}}Soldier."
     "63-65":
       choices: ["", ""]
-      description: "{{temperment}}City Watch."
+      description: "{{temperament}}City Watch."
     "66-68":
       choices: ["", ""]
-      description: "{{temperment}}Elite Guard."
+      description: "{{temperament}}Elite Guard."
     "69-71":
       choices: ["", ""]
-      description: "{{temperment}}Captain of the Guard."
+      description: "{{temperament}}Captain of the Guard."
     "72-73":
       choices: ["", ""]
-      description: "{{temperment}}Court Magician."
+      description: "{{temperament}}Court Magician."
     "74-76":
       choices: ["", ""]
-      description: "{{temperment}}Performer (street, theater, circus)."
+      description: "{{temperament}}Performer (street, theater, circus)."
     "77-79":
       choices: ["", ""]
-      description: "{{temperment}}Traveling Laborer (sailor, riverman, wagoner, etc.)."
+      description: "{{temperament}}Traveling Laborer (sailor, riverman, wagoner, etc.)."
     "80-82":
       choices: ["", ""]
-      description: "{{temperment}}Prostitute/Rent-boy."
+      description: "{{temperament}}Prostitute/Rent-boy."
     "83-85":
       choices: ["", ""]
-      description: "{{temperment}}Courtesan."
+      description: "{{temperament}}Courtesan."
     "86-88":
       choices: ["", ""]
-      description: "{{temperment}}Priest or Temple worker."
+      description: "{{temperament}}Priest or Temple worker."
     "89-91":
       choices: ["", ""]
-      description: "{{temperment}}Servant (servant, manservant, maid)."
+      description: "{{temperament}}Servant (servant, manservant, maid)."
     "92-94":
       choices: ["", ""]
-      description: "{{temperment}}Courtier."
+      description: "{{temperament}}Courtier."
     "95-97":
       choices: ["", ""]
-      description: "{{temperment}}Shopworker (brewer, baker, smith, etc.)."
+      description: "{{temperament}}Shopworker (brewer, baker, smith, etc.)."
     "98-100":
       choices: ["", ""]
-      description: "{{temperment}}Intellectual (teacher, engineer, advisor, lorekeeper, etc.)."
+      description: "{{temperament}}Intellectual (teacher, engineer, advisor, lorekeeper, etc.)."
 
   "Reason for/major events of your relationship":
     rolls: 1
     "01-09":
       choices: ["Prevented", "Caused"]
-      description: "{{temperment}} an embarassment."
+      description: "{{temperament}} an embarassment."
     "10-16":
       choices: ["Saved", "Caused"]
-      description: "{{temperment}} the loss of a treasured possession."
+      description: "{{temperament}} the loss of a treasured possession."
     "17-23":
       choices: ["Loved", "Jilted"]
-      description: "{{temperment}} them."
+      description: "{{temperament}} them."
     "24-30":
       choices: ["Helped", "Destroyed"]
-      description: "{{temperment}} an important relationship for them."
+      description: "{{temperament}} an important relationship for them."
     "31-37":
       choices: ["Aided", "Harmed"]
-      description: "{{temperment}} their business."
+      description: "{{temperament}} their business."
     "38-44":
       choices: ["Boosted", "Damaged"]
-      description: "{{temperment}} their reputation."
+      description: "{{temperament}} their reputation."
     "45-51":
       choices: ["Amused", "Annoyed"]
-      description: "{{temperment}} them, either repeatedly or profoundly."
+      description: "{{temperament}} them, either repeatedly or profoundly."
     "52-58":
       choices: ["Was", "Wasn't"]
-      description: "{{temperment}} there for them when they needed aid."
+      description: "{{temperament}} there for them when they needed aid."
     "59-65":
       choices: ["Saved", "Injured"]
-      description: "{{temperment}} a family member or loved one."
+      description: "{{temperament}} a family member or loved one."
     "66-72":
       choices: ["traumatic", "shameful"]
-      description: "Witnessed a {{temperment}} event in their life."
+      description: "Witnessed a {{temperament}} event in their life."
     "73-79":
       choices: ["Aided", "Hurt"]
-      description: "{{temperment}} them unexpextedly."
+      description: "{{temperament}} them unexpextedly."
     "80-86":
       choices: ["", ""]
-      description: "{{temperment}}Were both drunk in the same place and..."
+      description: "{{temperament}}Were both drunk in the same place and..."
     "87-93":
       choices: ["aided", "hurt"]
-      description: "Accidentally {{temperment}} them in some way."
+      description: "Accidentally {{temperament}} them in some way."
     "94-100":
       choices: ["Saved them from", "Exposed their involvement in"]
-      description: "{{temperment}} dark magic."
+      description: "{{temperament}} dark magic."
