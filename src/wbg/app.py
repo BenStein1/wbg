@@ -291,11 +291,8 @@ class WeckterBackstoryGenerator(toga.App):
                     choices = description_data.get('choices', [])
 
                     # Replace temperament placeholder if available
-                    if choices:
-                        replaced_description = description.replace('{{temperment}}', choices[1] if self.is_enemy else choices[0])
-                        selected_descriptions.append(replaced_description)
-                    else:
-                        selected_descriptions.append(description)
+                    replaced_description = description.replace('{{temperment}}', choices[1] if self.ally_enemy_toggle.value else choices[0])
+                    selected_descriptions.append(replaced_description)
 
             if num_rolls > 1:
                 sentences[category] = ", ".join(selected_descriptions)

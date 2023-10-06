@@ -253,7 +253,7 @@ AllyEnemyTables:
       description: "{{temperment}}Priest or Temple worker."
     "89-91":
       choices: ["", ""]
-      description: "{{temperment}}Servant (servvant, manservant, maid)."
+      description: "{{temperment}}Servant (servant, manservant, maid)."
     "92-94":
       choices: ["", ""]
       description: "{{temperment}}Courtier."
