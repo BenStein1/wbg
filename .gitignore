@@ -48,6 +48,9 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+.env
+.venv/
+.main.py.kate-swp
 
 # IntelliJ Idea family of suites
 .idea

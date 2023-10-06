@@ -49,7 +49,7 @@ class WeckterBackstoryGenerator(toga.App):
 
         description_labels = {}
         selected_sentences = "No features selected."
-        self.temperment_selected = None
+        self.temperament_selected = None
         self.combined_story = ""
 
         def wrap_text(text, max_width):
@@ -96,7 +96,7 @@ class WeckterBackstoryGenerator(toga.App):
                 #sub_categories = sub_categories_and_rolls[1]
                 for dice_roll, data in sub_categories.items():
                     choices, description = data['choices'], data['description']
-                    replaced_description = description.replace('{{temperment}}', choices[1] if is_enemy else choices[0])
+                    replaced_description = description.replace('{{temperament}}', choices[1] if is_enemy else choices[0])
                     wrapped_description = wrap_text(replaced_description, 75)
                     description_labels[category][dice_roll].text = wrapped_description
             self.update_selected_sentences()
@@ -234,7 +234,7 @@ class WeckterBackstoryGenerator(toga.App):
                 inner_box.add(choice_switch)
 
                 choices, description = data['choices'], data['description']
-                replaced_description = description.replace('{{temperment}}', choices[1] if is_enemy else choices[0])
+                replaced_description = description.replace('{{temperament}}', choices[1] if is_enemy else choices[0])
                 wrapped_description = wrap_text(replaced_description, 75)
 
                 self.selected_sentences.append(replaced_description)
@@ -321,7 +321,7 @@ class WeckterBackstoryGenerator(toga.App):
                     choices = description_data.get('choices', [])
 
                     # Replace temperament placeholder if available
-                    replaced_description = description.replace('{{temperment}}', choices[1] if self.ally_enemy_toggle.value else choices[0])
+                    replaced_description = description.replace('{{temperament}}', choices[1] if self.ally_enemy_toggle.value else choices[0])
                     selected_descriptions.append(replaced_description)
 
             if num_rolls > 1:

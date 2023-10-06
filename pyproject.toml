@@ -1,7 +1,7 @@
 # This project was generated with 0.3.15 using template: https://github.com/beeware/briefcase-template@v0.3.15
 [tool.briefcase]
 project_name = "Weckter Backstory Generator"
-bundle = "com.connertechnical.wbg"
+bundle = "com.connertechnical"
 version = "0.0.1"
 url = "https://about.me/benco"
 license = "Proprietary"
