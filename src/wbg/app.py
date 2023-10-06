@@ -129,13 +129,17 @@ class WeckterBackstoryGenerator(toga.App):
 
 
         # Create a text input for the D&D character name
-        self.character_name_input = toga.TextInput(placeholder='Enter D&D character name', style=Pack(padding=5, width=250))
+        self.character_name_input = toga.TextInput(placeholder='Enter D&D character name', style=Pack(padding=5, width=275))
+        self.character_race_input = toga.TextInput(placeholder='Enter D&D character race', style=Pack(padding=5, width=175))
+        self.character_class_input = toga.TextInput(placeholder='Enter D&D character class', style=Pack(padding=5, width=175))
 
         # Add the new box to the "Display" tab
         display_box.add(ally_enemy_name_box)
         # Add the label and text input to the box
         ally_enemy_name_box.add(self.ally_enemy_label)
         ally_enemy_name_box.add(self.character_name_input)
+        ally_enemy_name_box.add(self.character_race_input)
+        ally_enemy_name_box.add(self.character_class_input)
 
 
 
@@ -181,6 +185,8 @@ class WeckterBackstoryGenerator(toga.App):
         self.main_window.show()
 
         self.character_name_input.on_change = self.update_combined_story
+        self.character_race_input.on_change = self.update_combined_story
+        self.character_class_input.on_change = self.update_combined_story
 
         for category, sub_categories_and_rolls in self.data['AllyEnemyTables'].items():
             #print("sub_categories_and_rolls:", sub_categories_and_rolls)
@@ -332,7 +338,7 @@ class WeckterBackstoryGenerator(toga.App):
 
 
     def update_combined_story(self, widget=None):
-        self.combined_story = f"{self.ally_enemy_label.text} {self.character_name_input.value}\n{self.selected_sentences_label.text}"
+        self.combined_story = f"{self.ally_enemy_label.text} {self.character_name_input.value} the {self.character_race_input.value} {self.character_class_input.value}\n{self.selected_sentences_label.text}"
         print("Updated Combined Story:", self.combined_story)  # For debugging
 
 
