@@ -50,6 +50,7 @@ class WeckterBackstoryGenerator(toga.App):
         description_labels = {}
         selected_sentences = "No features selected."
         self.temperment_selected = None
+        self.combined_story = ""
 
         def wrap_text(text, max_width):
             words = text.split(' ')
@@ -87,6 +88,7 @@ class WeckterBackstoryGenerator(toga.App):
             print(f"is_enemy: {is_enemy}")
             # Update the ally_enemy_label based on the switch state
             self.ally_enemy_label.text = 'Enemy of' if is_enemy else 'Ally of'
+            self.update_combined_story()
 
 
             for category, sub_categories_and_rolls in self.data['AllyEnemyTables'].items():
@@ -178,6 +180,7 @@ class WeckterBackstoryGenerator(toga.App):
         self.main_window.content = option_container
         self.main_window.show()
 
+        self.character_name_input.on_change = self.update_combined_story
 
         for category, sub_categories_and_rolls in self.data['AllyEnemyTables'].items():
             #print("sub_categories_and_rolls:", sub_categories_and_rolls)
@@ -325,6 +328,12 @@ class WeckterBackstoryGenerator(toga.App):
             final_sentences.append(f"{category}:\n\t {desc}\n")
 
         self.selected_sentences_label.text = "\n".join(final_sentences)
+        self.update_combined_story()
+
+
+    def update_combined_story(self, widget=None):
+        self.combined_story = f"{self.ally_enemy_label.text} {self.character_name_input.value}\n{self.selected_sentences_label.text}"
+        print("Updated Combined Story:", self.combined_story)  # For debugging
 
 
 def main():
