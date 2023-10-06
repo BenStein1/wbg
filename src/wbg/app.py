@@ -85,6 +85,9 @@ class WeckterBackstoryGenerator(toga.App):
             print("update_descriptions is called!")
             is_enemy = self.ally_enemy_toggle.value if self.ally_enemy_toggle else False
             print(f"is_enemy: {is_enemy}")
+            # Update the ally_enemy_label based on the switch state
+            self.ally_enemy_label.text = 'Enemy of' if is_enemy else 'Ally of'
+
 
             for category, sub_categories_and_rolls in self.data['AllyEnemyTables'].items():
                 sub_categories = {key: val for key, val in sub_categories_and_rolls.items() if key != 'rolls'}
@@ -115,6 +118,24 @@ class WeckterBackstoryGenerator(toga.App):
 
         # Create a box for the "Display" option
         display_box = toga.Box(style=Pack(direction=COLUMN, padding=10))
+
+        # Create a box for the new 'Ally of'/'Enemy of' label and text box
+        ally_enemy_name_box = toga.Box(style=Pack(direction=ROW, padding=5, alignment=CENTER))
+        # Create a label that will be updated based on the switch state
+        self.ally_enemy_label = toga.Label('Ally of', style=Pack(direction=ROW, padding=5, alignment=CENTER))
+
+
+
+        # Create a text input for the D&D character name
+        self.character_name_input = toga.TextInput(placeholder='Enter D&D character name', style=Pack(padding=5, width=250))
+
+        # Add the new box to the "Display" tab
+        display_box.add(ally_enemy_name_box)
+        # Add the label and text input to the box
+        ally_enemy_name_box.add(self.ally_enemy_label)
+        ally_enemy_name_box.add(self.character_name_input)
+
+
 
         # Create a label to show selected sentences (this will be filled later)
         self.selected_sentences_label = toga.Label(f"{selected_sentences}", style=Pack(padding=(0, 5)))
