@@ -1,3 +1,8 @@
+from config import (
+    OPENAI_API_KEY
+)
+
+
     @staticmethod
     def generate_bio(combined_story):
 
@@ -38,7 +43,7 @@
 
 
 
-        apiKey = ""  # Replace with your actual ChatGPT API key
+        apiKey = OPENAI_API_KEY  # Replace with your actual ChatGPT API key
         url = "https://api.openai.com/v1/chat/completions"
         headers = {
             "Authorization": f"Bearer {apiKey}",
