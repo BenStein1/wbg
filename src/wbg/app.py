@@ -9,6 +9,8 @@ import random
 import yaml
 import os
 
+from .supportfiles import aiprompt
+
 class WeckterBackstoryGenerator(toga.App):
 
     def startup(self):
