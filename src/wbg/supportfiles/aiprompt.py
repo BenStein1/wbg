@@ -1,9 +1,11 @@
+import requests
+
 from ..config import (
     OPENAI_API_KEY
 )
 
 
-@staticmethod
+
 def generate_bio(combined_story):
 
     prompt = f"""

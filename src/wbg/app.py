@@ -9,7 +9,7 @@ import random
 import yaml
 import os
 
-from .supportfiles import aiprompt
+from .supportfiles import aiprompt as ai
 
 class WeckterBackstoryGenerator(toga.App):
 
@@ -77,10 +77,10 @@ class WeckterBackstoryGenerator(toga.App):
         def on_tab_select(self, widget):
             selected_tab = widget.index
             if selected_tab == 0:
-                # Perform actions for the first tab
+# Perform actions for the first tab
                 self.update_selected_sentences()
             elif selected_tab == 1:
-                # Perform actions for the second tab
+# Perform actions for the second tab
                 self.update_selected_sentences()
 
 
@@ -88,14 +88,14 @@ class WeckterBackstoryGenerator(toga.App):
             print("update_descriptions is called!")
             is_enemy = self.ally_enemy_toggle.value if self.ally_enemy_toggle else False
             print(f"is_enemy: {is_enemy}")
-            # Update the ally_enemy_label based on the switch state
+# Update the ally_enemy_label based on the switch state
             self.ally_enemy_label.text = 'Enemy of' if is_enemy else 'Ally of'
             self.update_combined_story()
 
 
             for category, sub_categories_and_rolls in self.data['AllyEnemyTables'].items():
                 sub_categories = {key: val for key, val in sub_categories_and_rolls.items() if key != 'rolls'}
-                #sub_categories = sub_categories_and_rolls[1]
+
                 for dice_roll, data in sub_categories.items():
                     choices, description = data['choices'], data['description']
                     replaced_description = description.replace('{{temperament}}', choices[1] if is_enemy else choices[0])
@@ -118,43 +118,53 @@ class WeckterBackstoryGenerator(toga.App):
         with open(yaml_path, 'r') as f:
             self.data = yaml.load(f, Loader=yaml.FullLoader)
 
+# Create a new box for the 'ChatGPT Bio' tab
+        chatgpt_bio_box = toga.Box(style=Pack(direction=COLUMN, padding=10))
+
+# Create a button to generate the bio
+        generate_bio_button = toga.Button('Generate Bio', on_press=self.generate_chatgpt_bio, style=Pack(padding=5, width=150))
+        chatgpt_bio_box.add(generate_bio_button)
 
 
-        # Create a box for the "Display" option
+# Create a box for the "Display" option
         display_box = toga.Box(style=Pack(direction=COLUMN, padding=10))
 
-        # Create a box for the new 'Ally of'/'Enemy of' label and text box
+# Create a box for the new 'Ally of'/'Enemy of' label and text box
         ally_enemy_name_box = toga.Box(style=Pack(direction=ROW, padding=5, alignment=CENTER))
-        # Create a label that will be updated based on the switch state
+# Create a label that will be updated based on the switch state
         self.ally_enemy_label = toga.Label('Ally of', style=Pack(direction=ROW, padding=5, alignment=CENTER))
 
 
 
-        # Create a text input for the D&D character name
+# Create a text input for the D&D character name
         self.character_name_input = toga.TextInput(placeholder='Enter D&D character name', style=Pack(padding=5, width=275))
         self.character_race_input = toga.TextInput(placeholder='Enter D&D character race', style=Pack(padding=5, width=175))
         self.character_class_input = toga.TextInput(placeholder='Enter D&D character class', style=Pack(padding=5, width=175))
 
-        # Add the new box to the "Display" tab
+# Add the new box to the "Display" tab
         display_box.add(ally_enemy_name_box)
-        # Add the label and text input to the box
+# Add the label and text input to the box
         ally_enemy_name_box.add(self.ally_enemy_label)
         ally_enemy_name_box.add(self.character_name_input)
         ally_enemy_name_box.add(self.character_race_input)
         ally_enemy_name_box.add(self.character_class_input)
 
+        bio = ""
 
-
-        # Create a label to show selected sentences (this will be filled later)
+# Create a label to show selected sentences (this will be filled later)
         self.selected_sentences_label = toga.Label(f"{selected_sentences}", style=Pack(padding=(0, 5)))
         display_box.add(self.selected_sentences_label)
 
+# Create a label to show chatgpt_bio (this will be filled later)
+        self.chatgpt_bio_label = toga.Label(f"{bio}", style=Pack(padding=(0, 5)))
+        chatgpt_bio_box.add(self.chatgpt_bio_label)
+
         main_box = toga.Box(style=Pack(direction=COLUMN, padding=10))
 
-        # Create an OptionContainer
+# Create an OptionContainer
         option_container = toga.OptionContainer()
 
-        # Create a ScrollContainer for the main_box
+# Create a ScrollContainer for the main_box
         scroll_container = toga.ScrollContainer(horizontal=False, vertical=True)
         scroll_container.content = main_box
 
@@ -175,13 +185,17 @@ class WeckterBackstoryGenerator(toga.App):
         self.selected_sentences = []
 
 
-        # Add the "Build" tab and its contents (now wrapped in a ScrollContainer)
+
+# Add the "Build" tab and its contents (now wrapped in a ScrollContainer)
         option_container.add("Build", scroll_container)
 
-        # Add the "Display" tab and its contents
+# Add the "Display" tab and its contents
         option_container.add("Display", display_box)
 
-        # Set the OptionContainer as the main window content
+# Add the new 'ChatGPT Bio' tab and its contents
+        option_container.add("ChatGPT Bio", chatgpt_bio_box)
+
+# Set the OptionContainer as the main window content
         self.main_window = toga.MainWindow(title=self.formal_name,size=(750, 1334))
         self.main_window.content = option_container
         self.main_window.show()
@@ -191,18 +205,18 @@ class WeckterBackstoryGenerator(toga.App):
         self.character_class_input.on_change = self.update_combined_story
 
         for category, sub_categories_and_rolls in self.data['AllyEnemyTables'].items():
-            #print("sub_categories_and_rolls:", sub_categories_and_rolls)
+#print("sub_categories_and_rolls:", sub_categories_and_rolls)
             num_rolls = sub_categories_and_rolls['rolls']
             sub_categories = sub_categories_and_rolls.copy()  # make a shallow copy
             del sub_categories['rolls']  # remove the 'rolls' entry
             roll_label = toga.Label("", style=roll_label_style)
             category_and_roll_box = toga.Box(style=Pack(padding=(0, 0), direction=COLUMN, alignment=CENTER))
-            #Orig width 31
+
             if len(str(category)) < 45:
                 diff = 45 - len(str(category))
                 padding = ' ' * (diff // 2)
 
-                # If the difference is odd, add one more space at the end
+# If the difference is odd, add one more space at the end
                 extra_space = ' ' if diff % 2 != 0 else ''
 
                 padded_category = f"{padding}{category}{padding}{extra_space}"
@@ -215,7 +229,7 @@ class WeckterBackstoryGenerator(toga.App):
             self.checkboxes[category] = {}
             self.switch_states[category] = {}
 
-            # Add category button and roll label to the new Box
+# Add category button and roll label to the new Box
             category_and_roll_box.add(category_button)
             category_and_roll_box.add(roll_label)
 
@@ -248,7 +262,7 @@ class WeckterBackstoryGenerator(toga.App):
                 main_box.add(inner_box)
 
         scroll_container = toga.ScrollContainer(horizontal=False, vertical=True)
-        #scroll_container.content = main_box
+
 
 
 
@@ -257,7 +271,7 @@ class WeckterBackstoryGenerator(toga.App):
         self.dice_label.text = f"Dice Result: {roll}"
         self.roll_button.text = f"Roll All Categories"
 
-        # Roll dice for all categories
+# Roll dice for all categories
         for category, sub_categories_and_rolls in self.data['AllyEnemyTables'].items():
             num_rolls = sub_categories_and_rolls['rolls']
             roll_label = toga.Label("", style=Pack(padding=(0, 10), font_family="NotoSansMono", font_size=15))
@@ -272,7 +286,7 @@ class WeckterBackstoryGenerator(toga.App):
                 roll = random.randint(1, 100)
                 group = None
 
-                # Determine which group this roll belongs to
+# Determine which group this roll belongs to
                 for roll_value in self.checkboxes[category]:
                     if '-' in roll_value:
                         lower, upper = map(int, roll_value.split('-'))
@@ -283,7 +297,7 @@ class WeckterBackstoryGenerator(toga.App):
                         group = (roll, roll)
                         break
 
-                # Add the roll if its group is unique
+# Add the roll if its group is unique
                 if group not in groups:
                     rolls.append(roll)
                     if group is not None:  # Add the group to our set
@@ -291,7 +305,7 @@ class WeckterBackstoryGenerator(toga.App):
 
             roll_label.text = f"Dice Roll: {', '.join(map(str, rolls))}"
 
-            # Update the switches
+# Update the switches
             for roll_value, switch in self.checkboxes[category].items():
                 should_be_on = False
                 if '-' in roll_value:
@@ -309,7 +323,7 @@ class WeckterBackstoryGenerator(toga.App):
 
     def update_selected_sentences(self):
         print("update_selected_sentences is called!")
-        # Clear out existing selected_sentences
+# Clear out existing selected_sentences
         self.selected_sentences = {}
 
         sentences = {}
@@ -322,7 +336,7 @@ class WeckterBackstoryGenerator(toga.App):
                     description = description_data['description']
                     choices = description_data.get('choices', [])
 
-                    # Replace temperament placeholder if available
+# Replace temperament placeholder if available
                     replaced_description = description.replace('{{temperament}}', choices[1] if self.ally_enemy_toggle.value else choices[0])
                     selected_descriptions.append(replaced_description)
 
@@ -342,6 +356,12 @@ class WeckterBackstoryGenerator(toga.App):
     def update_combined_story(self, widget=None):
         self.combined_story = f"{self.ally_enemy_label.text} {self.character_name_input.value} the {self.character_race_input.value} {self.character_class_input.value}\n{self.selected_sentences_label.text}"
         print("Updated Combined Story:", self.combined_story)  # For debugging
+
+
+    def generate_chatgpt_bio(self, widget):
+# Call the aiprompt.generate_bio method with the combined_story
+        bio = ai.generate_bio(self.combined_story)
+        print("Generated Bio:", bio)  # You can display this bio in the UI as needed
 
 
 def main():
