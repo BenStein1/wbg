@@ -12,6 +12,27 @@ import os
 from .supportfiles import aiprompt as ai
 
 class WeckterBackstoryGenerator(toga.App):
+    def wrap_text(self, text, max_width):
+        paragraphs = text.split('\n')
+        wrapped_paragraphs = []
+
+        for paragraph in paragraphs:
+            words = paragraph.split(' ')
+            lines = []
+            current_line = []
+
+            for word in words:
+                if len(' '.join(current_line) + ' ' + word) > max_width:
+                    lines.append(' '.join(current_line))
+                    current_line = [word]
+                else:
+                    current_line.append(word)
+
+            lines.append(' '.join(current_line))
+            wrapped_paragraphs.append('\n'.join(lines))
+
+        return '\n'.join(wrapped_paragraphs)
+
 
     def startup(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -54,20 +75,9 @@ class WeckterBackstoryGenerator(toga.App):
         self.temperament_selected = None
         self.combined_story = ""
 
-        def wrap_text(text, max_width):
-            words = text.split(' ')
-            lines = []
-            current_line = []
 
-            for word in words:
-                if len(' '.join(current_line) + ' ' + word) > max_width:
-                    lines.append(' '.join(current_line))
-                    current_line = [word]
-                else:
-                    current_line.append(word)
 
-            lines.append(' '.join(current_line))
-            return '\n'.join(lines)
+
 
 
 
@@ -99,7 +109,7 @@ class WeckterBackstoryGenerator(toga.App):
                 for dice_roll, data in sub_categories.items():
                     choices, description = data['choices'], data['description']
                     replaced_description = description.replace('{{temperament}}', choices[1] if is_enemy else choices[0])
-                    wrapped_description = wrap_text(replaced_description, 75)
+                    wrapped_description = self.wrap_text(replaced_description, 75)
                     description_labels[category][dice_roll].text = wrapped_description
             self.update_selected_sentences()
 
@@ -168,6 +178,10 @@ class WeckterBackstoryGenerator(toga.App):
         scroll_container = toga.ScrollContainer(horizontal=False, vertical=True)
         scroll_container.content = main_box
 
+# Create a ScrollContainer for the chatgpt_bio_box
+        scroll_container_chatgpt = toga.ScrollContainer(horizontal=False, vertical=True)
+        scroll_container_chatgpt.content = chatgpt_bio_box
+
 
 
 
@@ -192,8 +206,8 @@ class WeckterBackstoryGenerator(toga.App):
 # Add the "Display" tab and its contents
         option_container.add("Display", display_box)
 
-# Add the new 'ChatGPT Bio' tab and its contents
-        option_container.add("ChatGPT Bio", chatgpt_bio_box)
+# Add the new 'ChatGPT Bio' tab and its contents (now wrapped in a ScrollContainer)
+        option_container.add("ChatGPT Bio", scroll_container_chatgpt)
 
 # Set the OptionContainer as the main window content
         self.main_window = toga.MainWindow(title=self.formal_name,size=(750, 1334))
@@ -223,7 +237,7 @@ class WeckterBackstoryGenerator(toga.App):
             else:
                 padded_category = str(category)
 
-            wrapped_category = wrap_text(padded_category, 75)
+            wrapped_category = self.wrap_text(padded_category, 75)
             category_button = toga.Button(f"{wrapped_category}", on_press=self.roll_dice_for_category(category, roll_label, num_rolls), style=header_style)
 
             self.checkboxes[category] = {}
@@ -251,7 +265,7 @@ class WeckterBackstoryGenerator(toga.App):
 
                 choices, description = data['choices'], data['description']
                 replaced_description = description.replace('{{temperament}}', choices[1] if is_enemy else choices[0])
-                wrapped_description = wrap_text(replaced_description, 75)
+                wrapped_description = self.wrap_text(replaced_description, 75)
 
                 self.selected_sentences.append(replaced_description)
 
@@ -354,14 +368,22 @@ class WeckterBackstoryGenerator(toga.App):
 
 
     def update_combined_story(self, widget=None):
-        self.combined_story = f"{self.ally_enemy_label.text} {self.character_name_input.value} the {self.character_race_input.value} {self.character_class_input.value}\n{self.selected_sentences_label.text}"
+        self.combined_story = f"{self.ally_enemy_label.text}: My character (Name: {self.character_name_input.value}, Race: {self.character_race_input.value}, Class/Profession: {self.character_class_input.value} )\n{self.selected_sentences_label.text}"
         print("Updated Combined Story:", self.combined_story)  # For debugging
+
+
+
+
 
 
     def generate_chatgpt_bio(self, widget):
 # Call the aiprompt.generate_bio method with the combined_story
         bio = ai.generate_bio(self.combined_story)
         print("Generated Bio:", bio)  # You can display this bio in the UI as needed
+        wrapped_bio = self.wrap_text(bio, 115)
+        self.chatgpt_bio_label.text = wrapped_bio
+
+
 
 
 def main():

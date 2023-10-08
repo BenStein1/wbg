@@ -9,7 +9,7 @@ from ..config import (
 def generate_bio(combined_story):
 
     prompt = f"""
-    I have description of an acquaintance to my D and D character I will provide. Given the description I will provide you after this example format, give them a name and a short bio in the form of:
+    I have a description of an acquaintance to my D and D character that I will provide. Your bio must follow and include the features given. If the acquaintance is the same race as the character, your generated bio must have the race of your character be the same race of my provided character. You may not stray from any of the user provided character features, however I want you to create fantastic stories using the features presented. as well my character's race and class/profession as well, and then embelish details as you please to fill in personal events between our two characters. Given the description that will be provided to you after this example format, give your generated acquaintance a name and a short bio in the form of:
 
     Name:
         Eldrin the Sly
@@ -53,8 +53,7 @@ def generate_bio(combined_story):
     }
     params = {
         "messages": [{"role": "system", "content": prompt}, {"role": "user", "content": combined_story}],
-        "model": "gpt-3.5-turbo",
-        "max_tokens": 300
+        "model": "gpt-3.5-turbo"
     }
     response = requests.post(url, headers=headers, json=params)
     if response.ok:
