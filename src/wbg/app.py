@@ -216,26 +216,30 @@ class WeckterBackstoryGenerator(toga.App):
 ######ADD TOOLBAR
 
 
-        # Function to show the Preferences window
-        def show_preferences(widget):
-            # Create a new dialog window
-            preferences_window = toga.Window(title='Preferences', size=(300, 100))
+    # Function to save the API key
+        def save_api_key(self, widget):
+            key = Fernet.generate_key()  # Generate a key for encryption
+            cipher_suite = Fernet(key)
+            encrypted_api_key = cipher_suite.encrypt(self.api_key_input.value.encode())  # Encrypt the API key
 
-            # Create a text input box for the API key
-            api_key_input = toga.TextInput(placeholder='Enter OpenAI API Key')
+    # Load existing settings if the YAML file exists
+            try:
+                with open(settings_yaml_path, 'r') as f:
+                    settings = yaml.safe_load(f)
+            except FileNotFoundError:
+                settings = {}
 
-            # Create a button to save the API key
-            save_button = toga.Button('Save', on_press=save_api_key)
+    # Update the API key in the settings
+            if 'api_settings' not in settings:
+                settings['api_settings'] = {}
+            settings['api_settings']['api_key'] = encrypted_api_key.decode()
 
-            # Function to save the API key
-            def save_api_key(widget):
-                key = Fernet.generate_key()  # Generate a key for encryption
-                cipher_suite = Fernet(key)
-                encrypted_api_key = cipher_suite.encrypt(api_key_input.value.encode())  # Encrypt the API key
+    # Save the updated settings back to the YAML file
+            with open(settings_yaml_path, 'w') as f:
+                yaml.dump(settings, f)
 
-                # Save the encrypted API key to a YAML file
-                with open('wbg_settings.yaml', 'w') as f:
-                    yaml.dump({'api_key': encrypted_api_key.decode()}, f)
+
+
 
             # Create a box to hold the input field and button
             box = toga.Box(children=[api_key_input, save_button])
@@ -248,7 +252,7 @@ class WeckterBackstoryGenerator(toga.App):
 
 # Create a Command for the Preferences menu item
         preferences_cmd = toga.Command(
-            show_preferences,
+            self.show_preferences(),
             text='Preferences',
             tooltip='Tells you when it has been activated',
             group=app_settings,
@@ -444,27 +448,24 @@ class WeckterBackstoryGenerator(toga.App):
         self.chatgpt_bio_label.text = wrapped_bio
 
 
-# Function to save the API key
-    def save_api_key(widget):
-        key = Fernet.generate_key()  # Generate a key for encryption
-        cipher_suite = Fernet(key)
-        encrypted_api_key = cipher_suite.encrypt(api_key_input.value.encode())  # Encrypt the API key
 
-# Load existing settings if the YAML file exists
-        try:
-            with open(settings_yaml_path, 'r') as f:
-                settings = yaml.safe_load(f)
-        except FileNotFoundError:
-            settings = {}
 
-# Update the API key in the settings
-        if 'api_settings' not in settings:
-            settings['api_settings'] = {}
-        settings['api_settings']['api_key'] = encrypted_api_key.decode()
 
-# Save the updated settings back to the YAML file
-        with open(settings_yaml_path, 'w') as f:
-            yaml.dump(settings, f)
+# Function to show the Preferences window
+    def show_preferences(widget):
+        # Create a new dialog window
+        preferences_window = toga.Window(title='Preferences', size=(300, 100))
+
+        # Create a text input box for the API key
+        api_key_input = toga.TextInput(placeholder='Enter OpenAI API Key')
+
+        # Create a button to save the API key
+        save_button = toga.Button('Save', on_press=save_api_key)
+
+
+
+
+
 
 
 
