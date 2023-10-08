@@ -14,6 +14,14 @@ from .supportfiles import aiprompt as ai
 from .supportfiles import aistatblock
 
 class WeckterBackstoryGenerator(toga.App):
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    yaml_path = os.path.join(current_dir, 'supportfiles', 'AllyEnemyTables.yaml')
+    settings_yaml_path = os.path.join(current_dir, 'supportfiles', 'wbg_settings.yaml')
+    font_path = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Regular.ttf')
+    font_path_bold = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Bold.ttf')
+
+
+
     def wrap_text(self, text, max_width):
         paragraphs = text.split('\n')
         wrapped_paragraphs = []
@@ -44,7 +52,7 @@ class WeckterBackstoryGenerator(toga.App):
 
 # Load existing settings if the YAML file exists
         try:
-            with open(settings_yaml_path, 'r') as f:
+            with open(self.settings_yaml_path, 'r') as f:
                 settings = yaml.safe_load(f)
         except FileNotFoundError:
             settings = {}
@@ -55,11 +63,8 @@ class WeckterBackstoryGenerator(toga.App):
         settings['api_settings']['api_key'] = encrypted_api_key.decode()
 
 # Save the updated settings back to the YAML file
-        with open(settings_yaml_path, 'w') as f:
+        with open(self.settings_yaml_path, 'w') as f:
             yaml.dump(settings, f)
-
-
-#MOVED FROM HERE
 
 
 
@@ -88,14 +93,11 @@ class WeckterBackstoryGenerator(toga.App):
 
 
     def startup(self):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        yaml_path = os.path.join(current_dir, 'supportfiles', 'AllyEnemyTables.yaml')
-        settings_yaml_path = os.path.join(current_dir, 'supportfiles', 'wbg_settings.yaml')
-        font_path = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Regular.ttf')
-        font_path_bold = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Bold.ttf')
 
-        toga.Font.register("NotoSansMono", font_path)
-        toga.Font.register("NotoSansMono", font_path_bold, weight=BOLD)
+
+
+        toga.Font.register("NotoSansMono", self.font_path)
+        toga.Font.register("NotoSansMono", self.font_path_bold, weight=BOLD)
         custom_font = toga.Font("NotoSansMono", 14, weight=BOLD)
 
         big_header_style = Pack(
@@ -174,7 +176,7 @@ class WeckterBackstoryGenerator(toga.App):
         self.ally_enemy_box.add(self.ally_enemy_toggle)
         self.ally_enemy_box.add(self.enemy_label)
 
-        with open(yaml_path, 'r') as f:
+        with open(self.yaml_path, 'r') as f:
             self.data = yaml.load(f, Loader=yaml.FullLoader)
 
 # Create a new box for the 'ChatGPT Bio' tab
@@ -193,13 +195,14 @@ class WeckterBackstoryGenerator(toga.App):
         statblock_box.add(statblock_button)
 
 # Create a text input box for the API key
-        self.api_key_input = toga.TextInput(placeholder='Enter OpenAI API Key', style=Pack(padding=5, width=275))
+        self.api_key_input = toga.PasswordInput(placeholder='Enter OpenAI API Key', style=Pack(padding=5, width=300))
 
 # Create a button to save the API key
         save_button = toga.Button('Save', on_press=self.save_api_key, style=Pack(padding=5, width=150))
                 # Create a box to hold the input field and button
-        apibox = toga.Box(children=[self.api_key_input, save_button])
-        appsettings_box.add = apibox
+        self.api_key_label = toga.Label('OpenAI API Key', style=Pack(direction=ROW, padding=10, alignment=CENTER))
+        apibox = toga.Box(children=[self.api_key_label, self.api_key_input, save_button])
+        appsettings_box.add(apibox)
 
 
 # Create a box for the "Display" option
