@@ -34,6 +34,7 @@ class WeckterBackstoryGenerator(toga.App):
         return '\n'.join(wrapped_paragraphs)
 
 
+
     def startup(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         yaml_path = os.path.join(current_dir, 'supportfiles', 'AllyEnemyTables.yaml')
@@ -74,9 +75,6 @@ class WeckterBackstoryGenerator(toga.App):
         selected_sentences = "No features selected."
         self.temperament_selected = None
         self.combined_story = ""
-
-
-
 
 
 
@@ -258,6 +256,8 @@ class WeckterBackstoryGenerator(toga.App):
                     padded_dice_roll = str(dice_roll)
                 inner_box = toga.Box(style=Pack(direction=ROW, padding=5, alignment=CENTER))
                 choice_switch = toga.Switch(text=f"{padded_dice_roll}")
+                choice_switch.on_change = lambda s=choice_switch, c=category, r=dice_roll: self.on_switch_toggle(s, c, r)
+
                 self.checkboxes[category][dice_roll] = choice_switch
                 self.switch_states[category][dice_roll] = False
 
@@ -373,7 +373,14 @@ class WeckterBackstoryGenerator(toga.App):
 
 
 
+    def switch_toggled(widget):
+        self.update_selected_sentences()
 
+
+    def on_switch_toggle(self, switch, category, roll_value):
+        is_on = switch.value if switch.value else False
+        self.switch_states[category][roll_value] = is_on
+        self.update_selected_sentences()
 
 
     def generate_chatgpt_bio(self, widget):
