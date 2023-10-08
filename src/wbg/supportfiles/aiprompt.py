@@ -1,6 +1,6 @@
 import requests
 
-from ..config import (
+from .config import (
     OPENAI_API_KEY
 )
 

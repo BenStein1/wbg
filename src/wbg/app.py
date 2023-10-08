@@ -11,6 +11,7 @@ import yaml
 import os
 
 from .supportfiles import aiprompt as ai
+from .supportfiles import aistatblock
 
 class WeckterBackstoryGenerator(toga.App):
     def wrap_text(self, text, max_width):
@@ -33,6 +34,56 @@ class WeckterBackstoryGenerator(toga.App):
             wrapped_paragraphs.append('\n'.join(lines))
 
         return '\n'.join(wrapped_paragraphs)
+
+
+# Function to save the API key
+    def save_api_key(self, widget):
+        key = Fernet.generate_key()  # Generate a key for encryption
+        cipher_suite = Fernet(key)
+        encrypted_api_key = cipher_suite.encrypt(self.api_key_input.value.encode())  # Encrypt the API key
+
+# Load existing settings if the YAML file exists
+        try:
+            with open(settings_yaml_path, 'r') as f:
+                settings = yaml.safe_load(f)
+        except FileNotFoundError:
+            settings = {}
+
+# Update the API key in the settings
+        if 'api_settings' not in settings:
+            settings['api_settings'] = {}
+        settings['api_settings']['api_key'] = encrypted_api_key.decode()
+
+# Save the updated settings back to the YAML file
+        with open(settings_yaml_path, 'w') as f:
+            yaml.dump(settings, f)
+
+
+#MOVED FROM HERE
+
+
+
+# Function to show the Preferences window
+    def show_preferences(self, widget, event=None):
+        print("show_preferences was called")  # Debug print statement
+        # Create a new dialog window
+        preferences_window = toga.Window(title='Preferences', size=(300, 100))
+        print("Preferences window created")  # Debug print
+
+        print("Preferences window should be displayed now")  # Debug print
+        # Create a text input box for the API key
+        api_key_input = toga.TextInput(placeholder='Enter OpenAI API Key')
+
+        # Create a button to save the API key
+        save_button = toga.Button('Save', on_press=self.save_api_key)
+                # Create a box to hold the input field and button
+        box = toga.Box(children=[api_key_input, save_button])
+
+        # Add the box to the window and show it
+        preferences_window.content = box
+
+        preferences_window.show()
+
 
 
 
@@ -128,10 +179,27 @@ class WeckterBackstoryGenerator(toga.App):
 
 # Create a new box for the 'ChatGPT Bio' tab
         chatgpt_bio_box = toga.Box(style=Pack(direction=COLUMN, padding=10))
+# Create a new box for the 'statblock' tab
+        statblock_box = toga.Box(style=Pack(direction=COLUMN, padding=10))
+# Create a new box for the 'appsettings' tab
+        appsettings_box = toga.Box(style=Pack(direction=COLUMN, padding=10))
 
 # Create a button to generate the bio
         generate_bio_button = toga.Button('Generate Bio', on_press=self.generate_chatgpt_bio, style=Pack(padding=5, width=150))
         chatgpt_bio_box.add(generate_bio_button)
+
+# Create a button to generate the bio
+        statblock_button = toga.Button('Generate Statblock', on_press=self.generate_statblock, style=Pack(padding=5, width=150))
+        statblock_box.add(statblock_button)
+
+# Create a text input box for the API key
+        self.api_key_input = toga.TextInput(placeholder='Enter OpenAI API Key', style=Pack(padding=5, width=275))
+
+# Create a button to save the API key
+        save_button = toga.Button('Save', on_press=self.save_api_key, style=Pack(padding=5, width=150))
+                # Create a box to hold the input field and button
+        apibox = toga.Box(children=[self.api_key_input, save_button])
+        appsettings_box.add = apibox
 
 
 # Create a box for the "Display" option
@@ -157,15 +225,20 @@ class WeckterBackstoryGenerator(toga.App):
         ally_enemy_name_box.add(self.character_race_input)
         ally_enemy_name_box.add(self.character_class_input)
 
-        bio = ""
+        self.bio = ""
+        self.statblock = ""
 
 # Create a label to show selected sentences (this will be filled later)
         self.selected_sentences_label = toga.Label(f"{selected_sentences}", style=Pack(padding=(0, 5)))
         display_box.add(self.selected_sentences_label)
 
 # Create a label to show chatgpt_bio (this will be filled later)
-        self.chatgpt_bio_label = toga.Label(f"{bio}", style=Pack(padding=(0, 5)))
+        self.chatgpt_bio_label = toga.Label(f"{self.bio}", style=Pack(padding=(0, 5)))
         chatgpt_bio_box.add(self.chatgpt_bio_label)
+
+# Create a label to show statblock (this will be filled later)
+        self.statblock_label = toga.Label(f"{self.statblock}", style=Pack(padding=(0, 5)))
+        statblock_box.add(self.statblock_label)
 
         main_box = toga.Box(style=Pack(direction=COLUMN, padding=10))
 
@@ -179,7 +252,12 @@ class WeckterBackstoryGenerator(toga.App):
 # Create a ScrollContainer for the chatgpt_bio_box
         scroll_container_chatgpt = toga.ScrollContainer(horizontal=False, vertical=True)
         scroll_container_chatgpt.content = chatgpt_bio_box
-
+# Create a ScrollContainer for the statblock_box
+        scroll_container_statblock = toga.ScrollContainer(horizontal=False, vertical=True)
+        scroll_container_statblock.content = statblock_box
+# Create a ScrollContainer for the appsettings_box
+        scroll_container_appsettings = toga.ScrollContainer(horizontal=False, vertical=True)
+        scroll_container_appsettings.content = appsettings_box
 
 
 
@@ -207,65 +285,16 @@ class WeckterBackstoryGenerator(toga.App):
 # Add the new 'ChatGPT Bio' tab and its contents (now wrapped in a ScrollContainer)
         option_container.add("ChatGPT Bio", scroll_container_chatgpt)
 
+# Add the new 'ChatGPT Bio' tab and its contents (now wrapped in a ScrollContainer)
+        option_container.add("ChatGPT Statblock", scroll_container_statblock)
+
+# Add the new 'ChatGPT Bio' tab and its contents (now wrapped in a ScrollContainer)
+        option_container.add("Settings", scroll_container_appsettings)
+
 # Set the OptionContainer as the main window content
         self.main_window = toga.MainWindow(title=self.formal_name,size=(750, 1334))
         self.main_window.content = option_container
 
-
-
-######ADD TOOLBAR
-
-
-    # Function to save the API key
-        def save_api_key(self, widget):
-            key = Fernet.generate_key()  # Generate a key for encryption
-            cipher_suite = Fernet(key)
-            encrypted_api_key = cipher_suite.encrypt(self.api_key_input.value.encode())  # Encrypt the API key
-
-    # Load existing settings if the YAML file exists
-            try:
-                with open(settings_yaml_path, 'r') as f:
-                    settings = yaml.safe_load(f)
-            except FileNotFoundError:
-                settings = {}
-
-    # Update the API key in the settings
-            if 'api_settings' not in settings:
-                settings['api_settings'] = {}
-            settings['api_settings']['api_key'] = encrypted_api_key.decode()
-
-    # Save the updated settings back to the YAML file
-            with open(settings_yaml_path, 'w') as f:
-                yaml.dump(settings, f)
-
-
-
-
-            # Create a box to hold the input field and button
-            box = toga.Box(children=[api_key_input, save_button])
-
-            # Add the box to the window and show it
-            preferences_window.content = box
-            preferences_window.show()
-
-        app_settings = toga.Group("Settings")
-
-# Create a Command for the Preferences menu item
-        preferences_cmd = toga.Command(
-            self.show_preferences(),
-            text='Preferences',
-            tooltip='Tells you when it has been activated',
-            group=app_settings,
-            section=0
-        )
-
-        self.commands.add(preferences_cmd)
-        #self.main_window.toolbar.add(preferences_cmd)
-
-
-
-
-######ADD TOOLBAR
 
         self.main_window.show()
 
@@ -425,7 +454,7 @@ class WeckterBackstoryGenerator(toga.App):
 
 
     def update_combined_story(self, widget=None):
-        self.combined_story = f"{self.ally_enemy_label.text}: My character (Name: {self.character_name_input.value}, Race: {self.character_race_input.value}, Class/Profession: {self.character_class_input.value} )\n{self.selected_sentences_label.text}"
+        self.combined_story = f"{self.ally_enemy_label.text}: My character (Name: {self.character_name_input.value}, Race: {self.character_race_input.value}, Class/Profession: {self.character_class_input.value})\n{self.selected_sentences_label.text}"
         print("Updated Combined Story:", self.combined_story)  # For debugging
 
 
@@ -442,28 +471,17 @@ class WeckterBackstoryGenerator(toga.App):
 
     def generate_chatgpt_bio(self, widget):
 # Call the aiprompt.generate_bio method with the combined_story
-        bio = ai.generate_bio(self.combined_story)
-        print("Generated Bio:", bio)  # You can display this bio in the UI as needed
-        wrapped_bio = self.wrap_text(bio, 115)
+        self.bio = ai.generate_bio(self.combined_story)
+        print("Generated Bio:", self.bio)  # You can display this bio in the UI as needed
+        wrapped_bio = self.wrap_text(self.bio, 115)
         self.chatgpt_bio_label.text = wrapped_bio
 
-
-
-
-
-# Function to show the Preferences window
-    def show_preferences(widget):
-        # Create a new dialog window
-        preferences_window = toga.Window(title='Preferences', size=(300, 100))
-
-        # Create a text input box for the API key
-        api_key_input = toga.TextInput(placeholder='Enter OpenAI API Key')
-
-        # Create a button to save the API key
-        save_button = toga.Button('Save', on_press=save_api_key)
-
-
-
+    def generate_statblock(self, widget):
+# Call the aiprompt.generate_bio method with the combined_story
+        enemy_statblock = aistatblock.generate_statblock(self.bio)
+        print("Generated Statblock:", enemy_statblock)  # You can display this bio in the UI as needed
+        wrapped_statblock = self.wrap_text(enemy_statblock, 115)
+        self.statblock_label.text = wrapped_statblock
 
 
 
