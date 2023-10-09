@@ -21,7 +21,7 @@ class WeckterBackstoryGenerator(toga.App):
     settings_yaml_path = os.path.join(current_dir, 'supportfiles', 'wbg_settings.yaml')
     font_path = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Regular.ttf')
     font_path_bold = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Bold.ttf')
-    #OPENAI_API_KEY = []
+    OPENAI_API_KEY = None
 
 
     def wrap_text(self, text, max_width):
@@ -119,7 +119,7 @@ class WeckterBackstoryGenerator(toga.App):
             bit_encoded_encrypted_api_key = bit_decoded_encrypted_api_key.encode()
 
             bit_encoded_decrypted_api_key = cipher_suite.decrypt(bit_encoded_encrypted_api_key)
-            print("Can't load API key...")
+
             bit_decoded_decrypted_api_key = bit_encoded_decrypted_api_key.decode()
             print("load_settings bit decoding ending...")
 
@@ -258,7 +258,7 @@ class WeckterBackstoryGenerator(toga.App):
 
         self.api_key_input = toga.PasswordInput(placeholder='Enter OpenAI API Key', style=Pack(padding=5, width=300))
         if self.OPENAI_API_KEY:
-            self.api_key_input.text = self.OPENAI_API_KEY
+            self.api_key_input.value = self.OPENAI_API_KEY
 
 
 # Create a button to save the API key
