@@ -7,6 +7,8 @@ __pycache__/
 tags
 *.py[cod]
 *$py.class
+wbg.tif
+
 
 # OSX useful to ignore
 *.DS_Store
