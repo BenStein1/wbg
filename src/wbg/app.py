@@ -17,11 +17,11 @@ from .supportfiles import aistatblock
 class WeckterBackstoryGenerator(toga.App):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     yaml_path = os.path.join(current_dir, 'supportfiles', 'AllyEnemyTables.yaml')
-    #keyfile_path = os.path.join(current_dir, 'resources',
+    keyfile_path = os.path.join(current_dir, 'resources', 'wbg.tif')
     settings_yaml_path = os.path.join(current_dir, 'supportfiles', 'wbg_settings.yaml')
     font_path = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Regular.ttf')
     font_path_bold = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Bold.ttf')
-
+    #OPENAI_API_KEY = []
 
 
     def wrap_text(self, text, max_width):
@@ -48,10 +48,14 @@ class WeckterBackstoryGenerator(toga.App):
 
 # Function to save the API key
     def save_api_key(self, widget):
-        #key = Fernet.generate_key()  # Generate a key for encryption
+        print(f"save_api_key retrieve new encryption key:", self.encryption_key)  # Debug print statement#key = Fernet.generate_key()  # Generate a key for encryption
         cipher_suite = Fernet(self.encryption_key)
-        encrypted_api_key = cipher_suite.encrypt(self.api_key_input.value.encode())  # Encrypt the API key
+
         self.OPENAI_API_KEY = self.api_key_input.value
+        bit_encoded_api_key = self.OPENAI_API_KEY.encode()
+
+        bit_encoded_encrypted_api_key = cipher_suite.encrypt(bit_encoded_api_key)  # Encrypt the API key
+
 # Load existing settings if the YAML file exists
         try:
             with open(self.settings_yaml_path, 'r') as f:
@@ -63,15 +67,13 @@ class WeckterBackstoryGenerator(toga.App):
         if 'api_settings' not in settings:
             settings['api_settings'] = {}
 
-
-        # Encrypt the API key using the new encryption key
-        encrypted_api_key = cipher_suite.encrypt(self.OPENAI_API_KEY.encode()).decode()
-
         # Save the encrypted API key to settings_yaml_path
-        settings['api_settings']['api_key'] = encrypted_api_key
+        bit_decoded_encrypted_api_key = bit_encoded_encrypted_api_key.decode()
+        settings['api_settings']['api_key'] = (bit_decoded_encrypted_api_key)
         with open(self.settings_yaml_path, 'w') as f:
             yaml.safe_dump(settings, f)
-
+        print(f"Saved encoded key:", bit_decoded_encrypted_api_key)
+        print(f"save_api_key OPENAI_API_KEY:", self.OPENAI_API_KEY)# Debug print statement
 
 
 
@@ -99,42 +101,55 @@ class WeckterBackstoryGenerator(toga.App):
 
 
     def load_settings(self):
-        self.encryption_key = base64.urlsafe_b64encode(os.urandom(32))
+        self.encryption_key = Fernet.generate_key()
+        print(f"load_settings generate new encryption key:", self.encryption_key)# Generate a key for encryption
         try:
 # Read the old decryption key from resources/wbg.tif
-            with open('resources/wbg.tif', 'r') as f:
-                decryption_key = f.read().encode()
+            with open(self.keyfile_path, 'rb') as f:
+                decryption_key = f.read()
 
 # Decrypt the API key
             cipher_suite = Fernet(decryption_key)
+            print(f"load_settings old decryption key:", decryption_key)
             with open(self.settings_yaml_path, 'r') as f:
                 settings = yaml.safe_load(f)
-            encrypted_api_key = settings['api_settings'].get('api_key', '')
-            decrypted_api_key = cipher_suite.decrypt(encrypted_api_key.encode()).decode()
+            print("load_settings bit decoding beginning...")
+            bit_decoded_encrypted_api_key = settings['api_settings'].get('api_key', '')
+
+            bit_encoded_encrypted_api_key = bit_decoded_encrypted_api_key.encode()
+
+            bit_encoded_decrypted_api_key = cipher_suite.decrypt(bit_encoded_encrypted_api_key)
+            print("Can't load API key...")
+            bit_decoded_decrypted_api_key = bit_encoded_decrypted_api_key.decode()
+            print("load_settings bit decoding ending...")
 
 # Store the decrypted API key in an environment variable or attribute
-            self.OPENAI_API_KEY = decrypted_api_key
+            self.OPENAI_API_KEY = bit_decoded_decrypted_api_key
+            print(f"load_settings OPENAI_API_KEY:", self.OPENAI_API_KEY)
 
-            # Generate a new encryption key
-
-            cipher_suite = Fernet(encryption_key)
+            cipher_suite = Fernet(self.encryption_key)
 
             # Encrypt the API key using the new encryption key
-            encrypted_api_key = cipher_suite.encrypt(decrypted_api_key.encode()).decode()
+            bit_encoded_encrypted_api_key = cipher_suite.encrypt(bit_encoded_decrypted_api_key)
+            bit_decoded_encrypted_api_key = bit_encoded_encrypted_api_key.decode()
+
 
             # Save the encrypted API key to settings_yaml_path
-            settings['api_settings']['api_key'] = encrypted_api_key
+            settings['api_settings']['api_key'] = bit_decoded_encrypted_api_key
             with open(self.settings_yaml_path, 'w') as f:
                 yaml.safe_dump(settings, f)
-
-            # Save the new encryption key to resources/wbg.tif
-            with open('resources/wbg.tif', 'w') as f:
-                f.write(encryption_key.decode())
 
         except FileNotFoundError:
             print("Settings file or decryption key file not found. Using default settings.")
         except Exception as e:
             print(f"An error occurred while loading settings: {e}")
+            # Generate a new encryption key
+
+        # Save the new encryption key to resources/wbg.tif
+        with open(self.keyfile_path, 'wb') as f:
+            f.write(self.encryption_key)
+
+
 
 
     def startup(self):
@@ -240,7 +255,11 @@ class WeckterBackstoryGenerator(toga.App):
         statblock_box.add(statblock_button)
 
 # Create a text input box for the API key
+
         self.api_key_input = toga.PasswordInput(placeholder='Enter OpenAI API Key', style=Pack(padding=5, width=300))
+        if self.OPENAI_API_KEY:
+            self.api_key_input.text = self.OPENAI_API_KEY
+
 
 # Create a button to save the API key
         save_button = toga.Button('Save', on_press=self.save_api_key, style=Pack(padding=5, width=150))
