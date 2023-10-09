@@ -6,6 +6,7 @@ from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from toga.style.pack import BOLD, CENTER
 from cryptography.fernet import Fernet
+import base64
 import random
 import yaml
 import os
@@ -61,10 +62,10 @@ class WeckterBackstoryGenerator(toga.App):
 # Update the API key in the settings
         if 'api_settings' not in settings:
             settings['api_settings'] = {}
-        settings['api_settings']['api_key'] = encrypted_api_key.decode()
+
 
         # Encrypt the API key using the new encryption key
-        encrypted_api_key = cipher_suite.encrypt(decrypted_api_key.encode()).decode()
+        encrypted_api_key = cipher_suite.encrypt(self.OPENAI_API_KEY.encode()).decode()
 
         # Save the encrypted API key to settings_yaml_path
         settings['api_settings']['api_key'] = encrypted_api_key
@@ -98,6 +99,7 @@ class WeckterBackstoryGenerator(toga.App):
 
 
     def load_settings(self):
+        self.encryption_key = base64.urlsafe_b64encode(os.urandom(32))
         try:
 # Read the old decryption key from resources/wbg.tif
             with open('resources/wbg.tif', 'r') as f:
@@ -114,7 +116,7 @@ class WeckterBackstoryGenerator(toga.App):
             self.OPENAI_API_KEY = decrypted_api_key
 
             # Generate a new encryption key
-            self.encryption_key = os.urandom(32)
+
             cipher_suite = Fernet(encryption_key)
 
             # Encrypt the API key using the new encryption key
@@ -138,7 +140,7 @@ class WeckterBackstoryGenerator(toga.App):
     def startup(self):
 
         self.load_settings()
-
+        print(f"OPEN_API_KEY:", self.OPENAI_API_KEY)
         toga.Font.register("NotoSansMono", self.font_path)
         toga.Font.register("NotoSansMono", self.font_path_bold, weight=BOLD)
         custom_font = toga.Font("NotoSansMono", 14, weight=BOLD)
