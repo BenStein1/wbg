@@ -1,12 +1,12 @@
 import requests
 
-from .config import (
-    OPENAI_API_KEY
-)
+#from .config import (
+#    OPENAI_API_KEY
+#)
 
 
 
-def generate_statblock(enemy_bio):
+def generate_statblock(enemy_bio, OPENAI_API_KEY):
 #{party_level}
     prompt = f"""
     For an adventuring party of 4 at level 5, create a D and D statblock for the following character as a foe, with the all the appropriate stats for a D and D 5e foe. With appropriate weapons, attacks, tactics, and if appropriate, spells, for such a character. Provide the relevant XP for defeating such a foe, and an appropriate loot table to roll on as well.
