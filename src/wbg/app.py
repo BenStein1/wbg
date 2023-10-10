@@ -86,6 +86,8 @@ class WeckterBackstoryGenerator(toga.App):
         try:
             with open(self.settings_yaml_path, 'r') as f:
                 settings = yaml.safe_load(f)
+                if settings is None:
+                    settings = {}
         except FileNotFoundError:
             settings = {}
 
@@ -102,28 +104,42 @@ class WeckterBackstoryGenerator(toga.App):
         print(f"save_api_key OPENAI_API_KEY:", self.OPENAI_API_KEY)# Debug print statement
 
 
+    def on_text_change(self, widget):
+        print("Called on_text_change.")
+        self.save_display_settings()
 
-# Function to show the Preferences window
-    def show_preferences(self, widget, event=None):
-        print("show_preferences was called")  # Debug print statement
-        # Create a new dialog window
-        preferences_window = toga.Window(title='Preferences', size=(300, 100))
-        print("Preferences window created")  # Debug print
+    def on_field_focus_change(self, widget):
+        print("Called on_field_focus_change.")
+        self.save_display_settings()
 
-        print("Preferences window should be displayed now")  # Debug print
-        # Create a text input box for the API key
-        api_key_input = toga.TextInput(placeholder='Enter OpenAI API Key')
+    def save_display_settings(self, widget):
+        print("Called save_display_settings.")
+        # Collect the values from the text input fields
+        char_name_value = self.character_name_input.value
+        char_level_value = self.character_level_input.value
+        char_race_value = self.character_race_input.value
+        char_class_value = self.character_class_input.value
 
-        # Create a button to save the API key
-        save_button = toga.Button('Save', on_press=self.save_api_key)
-                # Create a box to hold the input field and button
-        box = toga.Box(children=[api_key_input, save_button])
+        try:
+            with open(self.settings_yaml_path, 'r') as f:
+                settings = yaml.safe_load(f)
+        except FileNotFoundError:
+            settings = {}
 
-        # Add the box to the window and show it
-        preferences_window.content = box
+        if 'character_details' not in settings:
+            settings['character_details'] = {}
 
-        preferences_window.show()
+        print("Create character dictionary.")
+        # Create a dictionary to hold the settings
+        settings['character_details']['name'] = char_name_value
+        settings['character_details']['level'] = str(char_level_value)
+        settings['character_details']['race'] = char_race_value
+        settings['character_details']['class'] = char_class_value
 
+        print("Write character settings.")
+        # Write the settings to wbg_settings.yaml
+        with open(self.settings_yaml_path, 'w') as f:
+            yaml.safe_dump(settings, f)
 
 
     def load_settings(self):
@@ -164,6 +180,19 @@ class WeckterBackstoryGenerator(toga.App):
             settings['api_settings']['api_key'] = bit_decoded_encrypted_api_key
             with open(self.settings_yaml_path, 'w') as f:
                 yaml.safe_dump(settings, f)
+
+
+# Load character details if they exist
+            character_details = settings.get('character_details', {})
+
+            if 'name' in character_details:
+                self.loaded_character_name = character_details['name']
+            if 'level' in character_details:
+                self.loaded_character_level = character_details['level']
+            if 'race' in character_details:
+                self.loaded_character_race = character_details['race']
+            if 'class' in character_details:
+                self.loaded_character_class = character_details['class']
 
         except FileNotFoundError:
             print("Settings file or decryption key file not found. Using default settings.")
@@ -302,6 +331,11 @@ class WeckterBackstoryGenerator(toga.App):
         apibox = toga.Box(children=[self.api_key_label, self.api_key_input, save_button, self.ai_keywarn_label])
         appsettings_box.add(apibox)
 
+        char_save_button = toga.Button('Save Character Details', on_press=self.save_display_settings, style=Pack(padding=5, width=150))
+        # Create a box to hold the input field and button
+        save_char_box = toga.Box(children=[char_save_button])
+        appsettings_box.add(save_char_box)
+
 
 
 # Create a box for the "Display" option
@@ -318,21 +352,32 @@ class WeckterBackstoryGenerator(toga.App):
 
         self.character_name_label = toga.Label('Character Name', style=Pack(alignment=CENTER))
         self.character_name_input = toga.TextInput(placeholder='Enter D&D character name', style=Pack(padding=5, width=275))
+        #self.character_name_input.on_lose_focus = self.on_field_focus_change()
         self.character_name_box = toga.Box(children=[self.character_name_label, self.character_name_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
         self.character_level_label = toga.Label('Level', style=Pack(alignment=CENTER))
         self.character_level_input = toga.NumberInput(min_value=1, value=1, step=1, style=Pack(padding=5))
+        #self.character_level_input.on_lose_focus = self.on_field_focus_change()
         self.character_level_box = toga.Box(children=[self.character_level_label, self.character_level_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
         self.character_race_label = toga.Label('Character Race', style=Pack(alignment=CENTER))
         self.character_race_input = toga.TextInput(placeholder='Enter D&D character race', style=Pack(padding=(0, 5, 0, 25), width=175))
+        #self.character_race_input.on_lose_focus = self.on_field_focus_change()
         self.character_race_box = toga.Box(children=[self.character_race_label, self.character_race_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
         self.character_class_label = toga.Label('Character Class', style=Pack(alignment=CENTER))
         self.character_class_input = toga.TextInput(placeholder='Enter D&D character class', style=Pack(padding=5, width=175))
+        #self.character_class_input.on_lose_focus = self.on_field_focus_change()
         self.character_class_box = toga.Box(children=[self.character_class_label, self.character_class_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
-
+        if self.loaded_character_name:
+            self.character_name_input.value = self.loaded_character_name
+        if self.loaded_character_level:
+            self.character_level_input.value = self.loaded_character_level
+        if self.loaded_character_race:
+            self.character_race_input.value = self.loaded_character_race
+        if self.loaded_character_class:
+            self.character_class_input.value = self.loaded_character_class
 
 
 # Add the new box to the "Display" tab
@@ -404,10 +449,10 @@ class WeckterBackstoryGenerator(toga.App):
 # Add the new 'ChatGPT Bio' tab and its contents (now wrapped in a ScrollContainer)
         option_container.add("ChatGPT Bio", scroll_container_chatgpt)
 
-# Add the new 'ChatGPT Bio' tab and its contents (now wrapped in a ScrollContainer)
+# Add the new 'ChatGPT Statblock' tab and its contents (now wrapped in a ScrollContainer)
         option_container.add("ChatGPT Statblock", scroll_container_statblock)
 
-# Add the new 'ChatGPT Bio' tab and its contents (now wrapped in a ScrollContainer)
+# Add the new 'Settings' tab and its contents (now wrapped in a ScrollContainer)
         option_container.add("Settings", scroll_container_appsettings)
 
 # Set the OptionContainer as the main window content

@@ -1,2 +1,7 @@
 api_settings:
-  api_key: gAAAAABlJQNzkVslJ3KrDRtTEuLBl140CCq8qcjKW5DU6R6OsKYC_VMKAZLAlWEyUDPLE8Zg3AIRi8J4oUzB7Ivf_xMpQuqTmFFBCnbRHpeuKU32rRtRaL2lcMZ2lJbzwbEc7pBBbPFNkWL5rzOAlrsVjnaZb8Uxew==
+  api_key: gAAAAABlJRze1yGLLwkNjITvYC-Mwal55VW37H0GLx8OePwSoKhB7xWnTK50rR7IaqtvfRYMCFwdjjk2NJgbajISmqP7TI4Kf0y33ZBkpI1BaVMNYBTblYNwP5EgsaRasIIVZuCBod4U16hXqn7J0arqtMqXXRzyLA==
+character_details:
+  class: barbarian
+  level: '8'
+  name: Dingus
+  race: Tiefling
