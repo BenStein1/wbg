@@ -597,7 +597,7 @@ class WeckterBackstoryGenerator(toga.App):
 
     def generate_statblock(self, widget):
 # Call the aiprompt.generate_bio method with the combined_story
-        enemy_statblock = aistatblock.generate_statblock(self.bio, self.OPENAI_API_KEY)
+        enemy_statblock = aistatblock.generate_statblock(self.bio, self.character_level_input.value, self.OPENAI_API_KEY)
         print("Generated Statblock:", enemy_statblock)  # You can display this bio in the UI as needed
         wrapped_statblock = self.wrap_text(enemy_statblock, 115)
         self.statblock_label.text = wrapped_statblock

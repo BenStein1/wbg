@@ -8,7 +8,7 @@ import requests
 
 def generate_bio(combined_story, OPENAI_API_KEY):
 
-    prompt = f"""
+    default_prompt = f"""
     I have a description of an acquaintance to my D and D character that I will provide. Your bio must follow and include the features given. If the acquaintance is the same race as the character, your generated bio must have the race of your character be the same race of my provided character. You may not stray from any of the user provided character features, however I want you to create fantastic stories using the features presented. as well my character's race and class/profession as well, and then embelish details as you please to fill in personal events between our two characters. Given the description that will be provided to you after this example format, give your generated acquaintance a name and a short bio in the form of:
 
     Name:
@@ -43,6 +43,11 @@ def generate_bio(combined_story, OPENAI_API_KEY):
     Now, Eldrin remains a constant shadow in Randalf's life, always plotting, always watching, and waiting for the perfect moment to exact what he perceives to be just revenge.
     """.strip()
 
+    settings_prompt = ""
+
+    selected_prompt = settings_prompt.strip() if settings_prompt and settings_prompt.strip() else default_prompt
+
+    complete_prompt = (selected_prompt).strip()
 
 
     apiKey = OPENAI_API_KEY  # Replace with your actual ChatGPT API key
@@ -52,7 +57,7 @@ def generate_bio(combined_story, OPENAI_API_KEY):
         "Content-Type": "application/json",
     }
     params = {
-        "messages": [{"role": "system", "content": prompt}, {"role": "user", "content": combined_story}],
+        "messages": [{"role": "system", "content": complete_prompt}, {"role": "user", "content": combined_story}],
         "model": "gpt-3.5-turbo"
     }
     response = requests.post(url, headers=headers, json=params)
