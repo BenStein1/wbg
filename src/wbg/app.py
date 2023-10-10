@@ -26,6 +26,12 @@ class CustomLabelBox(toga.Box):
 
         self.style.update(direction=COLUMN, alignment=CENTER)
 
+    def update_label(self, new_text):
+        self.label.text = new_text
+
+    def get_label_text(self):
+        return self.label.text
+
 
 
 
@@ -289,33 +295,50 @@ class WeckterBackstoryGenerator(toga.App):
 
 # Create a box for the new 'Ally of'/'Enemy of' label and text box
         ally_enemy_name_box = toga.Box(style=Pack(direction=ROW, padding=5, alignment=CENTER))
-# Create a label that will be updated based on the switch state
+
+
+
+        self.ally_enemy_header = toga.Label('    ', style=Pack(alignment=CENTER))
         self.ally_enemy_label = toga.Label('Ally of', style=Pack(direction=ROW, padding=5, alignment=CENTER))
+        self.al_en_box = toga.Box(children=[self.ally_enemy_header, self.ally_enemy_label], style=Pack(direction=COLUMN, alignment=CENTER))
 
+        self.character_name_label = toga.Label('Character Name', style=Pack(alignment=CENTER))
+        self.character_name_input = toga.TextInput(placeholder='Enter D&D character name', style=Pack(padding=5, width=275))
+        self.character_name_box = toga.Box(children=[self.character_name_label, self.character_name_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
-        self.character_level_input = CustomLabelBox(
-            label_text='Level',
-            box_content=toga.NumberInput(min_value=1, value=1, step=1, style=Pack(padding=0))  # This could be any Toga widget
-        )
+        self.character_level_label = toga.Label('Level', style=Pack(alignment=CENTER))
+        self.character_level_input = toga.NumberInput(min_value=1, value=1, step=1, style=Pack(padding=5))
+        self.character_level_box = toga.Box(children=[self.character_level_label, self.character_level_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
+        self.character_race_label = toga.Label('Character Race', style=Pack(alignment=CENTER))
+        self.character_race_input = toga.TextInput(placeholder='Enter D&D character race', style=Pack(padding=(0, 5, 0, 25), width=175))
+        self.character_race_box = toga.Box(children=[self.character_race_label, self.character_race_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
+        self.character_class_label = toga.Label('Character Class', style=Pack(alignment=CENTER))
+        self.character_class_input = toga.TextInput(placeholder='Enter D&D character class', style=Pack(padding=5, width=175))
+        self.character_class_box = toga.Box(children=[self.character_class_label, self.character_class_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
 # Create a text input for the D&D character name
-        self.character_name_input = toga.TextInput(placeholder='Enter D&D character name', style=Pack(padding=5, width=275))
+        #self.character_name_input = toga.TextInput(placeholder='Enter D&D character name', style=Pack(padding=5, width=275))
         #self.character_level_label = toga.Label('Level', style=Pack(direction=ROW, padding=5, alignment=CENTER))
         #self.character_level_input = toga.NumberInput(min_value=1, value=1, step=1, style=Pack(padding=0))
-        self.character_race_input = toga.TextInput(placeholder='Enter D&D character race', style=Pack(padding=50, width=175))
-        self.character_class_input = toga.TextInput(placeholder='Enter D&D character class', style=Pack(padding=5, width=175))
+        #self.character_race_input = toga.TextInput(placeholder='Enter D&D character race', style=Pack(padding=50, width=175))
+        #self.character_class_input = toga.TextInput(placeholder='Enter D&D character class', style=Pack(padding=5, width=175))
 
 # Add the new box to the "Display" tab
         display_box.add(ally_enemy_name_box)
 # Add the label and text input to the box
-        ally_enemy_name_box.add(self.ally_enemy_label)
-        ally_enemy_name_box.add(self.character_name_input)
+        #ally_enemy_name_box.add(self.ally_enemy_label)
+        ally_enemy_name_box.add(self.al_en_box)
+        ally_enemy_name_box.add(self.character_name_box)
+        #ally_enemy_name_box.add(self.character_name_input)
         #ally_enemy_name_box.add(self.character_level_label)
-        ally_enemy_name_box.add(self.custom_label_box)
-        ally_enemy_name_box.add(self.character_race_input)
-        ally_enemy_name_box.add(self.character_class_input)
+        #ally_enemy_name_box.add(self.character_level_input)
+        ally_enemy_name_box.add(self.character_level_box)
+        #ally_enemy_name_box.add(self.character_race_input)
+        ally_enemy_name_box.add(self.character_race_box)
+        #ally_enemy_name_box.add(self.character_class_input)
+        ally_enemy_name_box.add(self.character_class_box)
 
         self.bio = ""
         self.statblock = ""

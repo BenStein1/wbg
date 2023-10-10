@@ -241,7 +241,7 @@ AllyEnemyTables:
       description: "{{temperament}}Performer (street, theater, circus)."
     "77-79":
       choices: ["", ""]
-      description: "{{temperament}}Traveling Laborer (sailor, riverman, wagoner, etc.)."
+      description: "{{temperament}}Traveling Laborer (sailor, river-man, wagoner, etc.)."
     "80-82":
       choices: ["", ""]
       description: "{{temperament}}Prostitute/Rent-boy."
@@ -259,16 +259,15 @@ AllyEnemyTables:
       description: "{{temperament}}Courtier."
     "95-97":
       choices: ["", ""]
-      description: "{{temperament}}Shopworker (brewer, baker, smith, etc.)."
+      description: "{{temperament}}Shop-worker (brewer, baker, smith, etc.)."
     "98-100":
       choices: ["", ""]
-      description: "{{temperament}}Intellectual (teacher, engineer, advisor, lorekeeper, etc.)."
-
+      description: "{{temperament}}Intellectual (teacher, engineer, advisor, lore-keeper, etc.)."
   "Reason for/major events of your relationship":
     rolls: 1
     "01-09":
       choices: ["Prevented", "Caused"]
-      description: "{{temperament}} an embarassment."
+      description: "{{temperament}} an embarrassment."
     "10-16":
       choices: ["Saved", "Caused"]
       description: "{{temperament}} the loss of a treasured possession."
@@ -298,7 +297,7 @@ AllyEnemyTables:
       description: "Witnessed a {{temperament}} event in their life."
     "73-79":
       choices: ["Aided", "Hurt"]
-      description: "{{temperament}} them unexpextedly."
+      description: "{{temperament}} them unexpectedly."
     "80-86":
       choices: ["", ""]
       description: "{{temperament}}Were both drunk in the same place and..."
