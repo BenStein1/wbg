@@ -1,8 +1,12 @@
 import requests
 
-#from .config import (
+
+from .config import (
 #    OPENAI_API_KEY
-#)
+    AI_MODEL,
+    AI_INPUT_COST,
+    AI_OUTPUT_COST
+)
 
 
 
@@ -34,6 +38,21 @@ def generate_statblock(enemy_bio, level, OPENAI_API_KEY):
     response = requests.post(url, headers=headers, json=params)
     if response.ok:
         enemy_statblock = response.json().get('choices')[0].get('message').get('content')
+
+        compl_tokens = response.json().get('usage').get('completion_tokens')
+        pr_tokens = response.json().get('usage').get('prompt_tokens')
+        returned_tokens = response.json().get('usage').get('total_tokens')
+
+        sent_cost = (compl_tokens/1000) * AI_INPUT_COST
+        received_cost = (pr_tokens/1000) * AI_OUTPUT_COST
+        total_aimessage_cost = sent_cost + received_cost
+        formatted_total_aimessage_cost = "${:.4f}".format(total_aimessage_cost)
+
+        print(f"GPTTok completion_tokens: {compl_tokens}") #GRAND TOTAL TOKENS
+        print(f"GPTTok prompt_tokens    : {pr_tokens}") #GRAND TOTAL TOKENS
+        print(f"GPTTok total tokens     : {returned_tokens}") #GRAND TOTAL TOKENS
+        print(f"Total message cost      : {formatted_total_aimessage_cost}")
+
         return enemy_statblock
     else:
         print(f"API Error: {response.status_code} - {response.text}")

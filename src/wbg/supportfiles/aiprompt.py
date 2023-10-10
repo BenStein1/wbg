@@ -1,12 +1,18 @@
 import requests
+import tiktoken
 
-#from .config import (
+from .config import (
 #    OPENAI_API_KEY
-#)
+    AI_MODEL,
+    AI_INPUT_COST,
+    AI_OUTPUT_COST
+)
+
 
 
 
 def generate_bio(combined_story, OPENAI_API_KEY):
+
 
     default_prompt = f"""
     I have a description of an acquaintance to my D and D character that I will provide. Your bio must follow and include the features given. If the acquaintance is the same race as the character, your generated bio must have the race of your character be the same race of my provided character. You may not stray from any of the user provided character features, however I want you to create fantastic stories using the features presented. as well my character's race and class/profession as well, and then embelish details as you please to fill in personal events between our two characters. Given the description that will be provided to you after this example format, give your generated acquaintance a name and a short bio in the form of:
@@ -60,9 +66,36 @@ def generate_bio(combined_story, OPENAI_API_KEY):
         "messages": [{"role": "system", "content": complete_prompt}, {"role": "user", "content": combined_story}],
         "model": "gpt-3.5-turbo"
     }
+
+
+
     response = requests.post(url, headers=headers, json=params)
     if response.ok:
         chatgpt_bio = response.json().get('choices')[0].get('message').get('content')
+
+        compl_tokens = response.json().get('usage').get('completion_tokens')
+        pr_tokens = response.json().get('usage').get('prompt_tokens')
+        returned_tokens = response.json().get('usage').get('total_tokens')
+
+        sent_cost = (compl_tokens/1000) * AI_INPUT_COST
+        received_cost = (pr_tokens/1000) * AI_OUTPUT_COST
+        total_aimessage_cost = sent_cost + received_cost
+        formatted_total_aimessage_cost = "${:.4f}".format(total_aimessage_cost)
+
+        print(f"GPTTok completion_tokens: {compl_tokens}") #GRAND TOTAL TOKENS
+        print(f"GPTTok prompt_tokens    : {pr_tokens}") #GRAND TOTAL TOKENS
+        print(f"GPTTok total tokens     : {returned_tokens}") #GRAND TOTAL TOKENS
+        print(f"Total message cost      : {formatted_total_aimessage_cost}")
+
+        #tokens_received = num_tokens_from_messages(received_message, AI_MODEL)
+        #print(f"Tokens received: {tokens_received}")
+
+        #print(f"GPTTok received: {returned_tokens}") #GRAND TOTAL TOKENS
+        #received_cost = tokens_received * AI_OUTPUT_COST
+        #total_aimessage_cost = sent_cost + received_cost
+        #formatted_total_aimessage_cost = "${:.2f}".format(total_aimessage_cost)
+        #print(f"Total message cost: {formatted_total_aimessage_cost}")
+
         return chatgpt_bio
     else:
         print(f"API Error: {response.status_code} - {response.text}")

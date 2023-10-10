@@ -6,10 +6,14 @@ from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from toga.style.pack import BOLD, CENTER
 from cryptography.fernet import Fernet
+#from tiktoken import Tokenizer, Token
 import base64
 import random
 import yaml
 import os
+from .supportfiles.config import (
+    AI_MODEL
+)
 
 from .supportfiles import aiprompt as ai
 from .supportfiles import aistatblock
@@ -43,6 +47,12 @@ class WeckterBackstoryGenerator(toga.App):
     font_path = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Regular.ttf')
     font_path_bold = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Bold.ttf')
     OPENAI_API_KEY = None
+
+    #def count_tokens(text):
+        #tokenizer = Tokenizer()
+        #enc = tiktoken.get_encoding("cl100k_base") # For cl100k_base: Includes - gpt-4, gpt-3.5-turbo, text-embedding-ada-002
+        #enc = tiktoken.encoding_for_model(AI_MODEL)
+        #return sum(1 for token in tokenizer.tokenize(text))
 
 
     def wrap_text(self, text, max_width):
@@ -247,6 +257,7 @@ class WeckterBackstoryGenerator(toga.App):
         selected_sentences = "No features selected."
         self.temperament_selected = None
         self.combined_story = ""
+        self.token_count = None
 
 
 
@@ -322,7 +333,7 @@ class WeckterBackstoryGenerator(toga.App):
             self.generate_bio_button.enabled = True
             self.statblock_button.enabled = True
 
-
+# Add items to Settings tab
 # Create a button to save the API key
         save_button = toga.Button('Save', on_press=self.save_api_key, style=Pack(padding=5, width=150))
                 # Create a box to hold the input field and button
@@ -331,10 +342,20 @@ class WeckterBackstoryGenerator(toga.App):
         apibox = toga.Box(children=[self.api_key_label, self.api_key_input, save_button, self.ai_keywarn_label])
         appsettings_box.add(apibox)
 
+
+        #self.token_count_label = toga.Label('OpenAI Token Count: 0', style=Pack(direction=ROW, padding=10, alignment=CENTER))
+        #appsettings_box.add(self.token_count_label)
+        #self.token_count = count_tokens(text)
+        #print(f"Token count: {self.token_count}")
+
+
         char_save_button = toga.Button('Save Character Details', on_press=self.save_display_settings, style=Pack(padding=5, width=150))
         # Create a box to hold the input field and button
         save_char_box = toga.Box(children=[char_save_button])
         appsettings_box.add(save_char_box)
+
+
+
 
 
 
