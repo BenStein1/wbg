@@ -76,8 +76,7 @@ class WeckterBackstoryGenerator(toga.App):
 
         self.generate_bio_button.enabled = True
         self.statblock_button.enabled = True
-        self.chatgpt_bio_box.remove(self.generate_bio_label)
-        self.statblock_box.remove(self.statblock_label)
+
 
         bit_encoded_api_key = self.OPENAI_API_KEY.encode()
 
@@ -275,15 +274,13 @@ class WeckterBackstoryGenerator(toga.App):
 
 # Create a button to generate the bio
         self.generate_bio_button = toga.Button('Generate Bio', on_press=self.generate_chatgpt_bio, enabled=False, style=Pack(padding=5, width=150))
-        self.generate_bio_label = toga.Label('Enter an OpenAI API Key to enable.\n https://platform.openai.com/account/api-keys', style=Pack(direction=ROW, padding=10, alignment=CENTER))
         chatgpt_bio_box.add(self.generate_bio_button)
-        chatgpt_bio_box.add(self.generate_bio_label)
+
 
 # Create a button to generate the bio
         self.statblock_button = toga.Button('Generate Statblock', on_press=self.generate_statblock, enabled=False, style=Pack(padding=5, width=150))
-        self.statblock_label = toga.Label('Enter an OpenAI API Key to enable.\n https://platform.openai.com/account/api-keys', style=Pack(direction=ROW, padding=10, alignment=CENTER))
         statblock_box.add(self.statblock_button)
-        statblock_box.add(self.statblock_label)
+
 
 
 
@@ -295,19 +292,14 @@ class WeckterBackstoryGenerator(toga.App):
             self.api_key_input.value = self.OPENAI_API_KEY
             self.generate_bio_button.enabled = True
             self.statblock_button.enabled = True
-            if hasattr(self, 'generate_bio_label'):
-                chatgpt_bio_box.remove(self.generate_bio_label)
-
-            if hasattr(self, 'statblock_label'):
-                statblock_box.remove(self.statblock_label)
-
 
 
 # Create a button to save the API key
         save_button = toga.Button('Save', on_press=self.save_api_key, style=Pack(padding=5, width=150))
                 # Create a box to hold the input field and button
         self.api_key_label = toga.Label('OpenAI API Key', style=Pack(direction=ROW, padding=10, alignment=CENTER))
-        apibox = toga.Box(children=[self.api_key_label, self.api_key_input, save_button])
+        self.ai_keywarn_label = toga.Label('Enter an OpenAI API Key to enable ChatGPT features.\n https://platform.openai.com/account/api-keys', style=Pack(direction=ROW, padding=3, alignment=CENTER))
+        apibox = toga.Box(children=[self.api_key_label, self.api_key_input, save_button, self.ai_keywarn_label])
         appsettings_box.add(apibox)
 
 
