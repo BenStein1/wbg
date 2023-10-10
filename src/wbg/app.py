@@ -73,6 +73,12 @@ class WeckterBackstoryGenerator(toga.App):
         cipher_suite = Fernet(self.encryption_key)
 
         self.OPENAI_API_KEY = self.api_key_input.value
+
+        self.generate_bio_button.enabled = True
+        self.statblock_button.enabled = True
+        self.chatgpt_bio_box.remove(self.generate_bio_label)
+        self.statblock_box.remove(self.statblock_label)
+
         bit_encoded_api_key = self.OPENAI_API_KEY.encode()
 
         bit_encoded_encrypted_api_key = cipher_suite.encrypt(bit_encoded_api_key)  # Encrypt the API key
@@ -268,18 +274,33 @@ class WeckterBackstoryGenerator(toga.App):
         appsettings_box = toga.Box(style=Pack(direction=COLUMN, padding=10))
 
 # Create a button to generate the bio
-        generate_bio_button = toga.Button('Generate Bio', on_press=self.generate_chatgpt_bio, style=Pack(padding=5, width=150))
-        chatgpt_bio_box.add(generate_bio_button)
+        self.generate_bio_button = toga.Button('Generate Bio', on_press=self.generate_chatgpt_bio, enabled=False, style=Pack(padding=5, width=150))
+        self.generate_bio_label = toga.Label('Enter an OpenAI API Key to enable.\n https://platform.openai.com/account/api-keys', style=Pack(direction=ROW, padding=10, alignment=CENTER))
+        chatgpt_bio_box.add(self.generate_bio_button)
+        chatgpt_bio_box.add(self.generate_bio_label)
 
 # Create a button to generate the bio
-        statblock_button = toga.Button('Generate Statblock', on_press=self.generate_statblock, style=Pack(padding=5, width=150))
-        statblock_box.add(statblock_button)
+        self.statblock_button = toga.Button('Generate Statblock', on_press=self.generate_statblock, enabled=False, style=Pack(padding=5, width=150))
+        self.statblock_label = toga.Label('Enter an OpenAI API Key to enable.\n https://platform.openai.com/account/api-keys', style=Pack(direction=ROW, padding=10, alignment=CENTER))
+        statblock_box.add(self.statblock_button)
+        statblock_box.add(self.statblock_label)
+
+
 
 # Create a text input box for the API key
 
         self.api_key_input = toga.PasswordInput(placeholder='Enter OpenAI API Key', style=Pack(padding=5, width=300))
+#Turn OpenAI Options on if API key filled in and fill in box
         if self.OPENAI_API_KEY:
             self.api_key_input.value = self.OPENAI_API_KEY
+            self.generate_bio_button.enabled = True
+            self.statblock_button.enabled = True
+            if hasattr(self, 'generate_bio_label'):
+                chatgpt_bio_box.remove(self.generate_bio_label)
+
+            if hasattr(self, 'statblock_label'):
+                statblock_box.remove(self.statblock_label)
+
 
 
 # Create a button to save the API key
@@ -290,6 +311,7 @@ class WeckterBackstoryGenerator(toga.App):
         appsettings_box.add(apibox)
 
 
+
 # Create a box for the "Display" option
         display_box = toga.Box(style=Pack(direction=COLUMN, padding=10))
 
@@ -297,7 +319,7 @@ class WeckterBackstoryGenerator(toga.App):
         ally_enemy_name_box = toga.Box(style=Pack(direction=ROW, padding=5, alignment=CENTER))
 
 
-
+# Create a text input for the D&D character name
         self.ally_enemy_header = toga.Label('    ', style=Pack(alignment=CENTER))
         self.ally_enemy_label = toga.Label('Ally of', style=Pack(direction=ROW, padding=5, alignment=CENTER))
         self.al_en_box = toga.Box(children=[self.ally_enemy_header, self.ally_enemy_label], style=Pack(direction=COLUMN, alignment=CENTER))
@@ -318,26 +340,16 @@ class WeckterBackstoryGenerator(toga.App):
         self.character_class_input = toga.TextInput(placeholder='Enter D&D character class', style=Pack(padding=5, width=175))
         self.character_class_box = toga.Box(children=[self.character_class_label, self.character_class_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
-# Create a text input for the D&D character name
-        #self.character_name_input = toga.TextInput(placeholder='Enter D&D character name', style=Pack(padding=5, width=275))
-        #self.character_level_label = toga.Label('Level', style=Pack(direction=ROW, padding=5, alignment=CENTER))
-        #self.character_level_input = toga.NumberInput(min_value=1, value=1, step=1, style=Pack(padding=0))
-        #self.character_race_input = toga.TextInput(placeholder='Enter D&D character race', style=Pack(padding=50, width=175))
-        #self.character_class_input = toga.TextInput(placeholder='Enter D&D character class', style=Pack(padding=5, width=175))
+
+
 
 # Add the new box to the "Display" tab
         display_box.add(ally_enemy_name_box)
 # Add the label and text input to the box
-        #ally_enemy_name_box.add(self.ally_enemy_label)
         ally_enemy_name_box.add(self.al_en_box)
         ally_enemy_name_box.add(self.character_name_box)
-        #ally_enemy_name_box.add(self.character_name_input)
-        #ally_enemy_name_box.add(self.character_level_label)
-        #ally_enemy_name_box.add(self.character_level_input)
         ally_enemy_name_box.add(self.character_level_box)
-        #ally_enemy_name_box.add(self.character_race_input)
         ally_enemy_name_box.add(self.character_race_box)
-        #ally_enemy_name_box.add(self.character_class_input)
         ally_enemy_name_box.add(self.character_class_box)
 
         self.bio = ""
