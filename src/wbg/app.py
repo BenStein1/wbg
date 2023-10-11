@@ -250,15 +250,23 @@ class WeckterBackstoryGenerator(toga.App):
             if 'name' in character_details:
                 self.loaded_character_name = character_details['name']
                 print(f"Name:", self.loaded_character_name)
+            else:
+                self.loaded_character_name = None
             if 'level' in character_details:
                 self.loaded_character_level = character_details['level']
                 print(f"Level:", self.loaded_character_level)
+            else:
+                self.loaded_character_level = None
             if 'race' in character_details:
                 self.loaded_character_race = character_details['race']
                 print(f"Race:", self.loaded_character_race)
+            else:
+                self.loaded_character_race = None
             if 'class' in character_details:
                 self.loaded_character_class = character_details['class']
                 print(f"Class:", self.loaded_character_class)
+            else:
+                self.loaded_character_class = None
 
             print(f"Attempting AI settings load...")
             ai_settings = settings.get('api_settings', {})
