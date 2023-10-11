@@ -1,8 +1,3 @@
 api_settings:
   ai_model: gpt-3.5-turbo
-  api_key: gAAAAABlJiRno8hHYyr8qSAyqics9odT8DnsbUQj1DInaCMCvekYxPZRMYjZADVZAQBDXSft9gSmTh0hhtBTQ1YhsJkY_d_ZWtX-0MaM3rjN3vo8EAi80tGg3Mc1WUKNzpQdEd0Le-0wyKEx_aCLS2sMTYMrnCHhtw==
-character_details:
-  class: barbarian
-  level: '8'
-  name: Dingus
-  race: Tiefling
+  api_key:
