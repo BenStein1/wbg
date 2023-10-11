@@ -2,11 +2,11 @@
 RPG Character Backstory Generator
 """
 import toga
+#from toga import Clipboard
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from toga.style.pack import BOLD, CENTER
 from cryptography.fernet import Fernet
-#from tiktoken import Tokenizer, Token
 import base64
 import random
 import yaml
@@ -409,7 +409,6 @@ class WeckterBackstoryGenerator(toga.App):
 
 
 
-
 # Create a text input box for the API key
 
         self.api_key_input = toga.PasswordInput(placeholder='Enter OpenAI API Key', style=Pack(padding=5, width=300))
@@ -441,14 +440,44 @@ class WeckterBackstoryGenerator(toga.App):
 
 
 
-        char_save_button = toga.Button('Save Character Details', on_press=self.save_display_settings, style=Pack(padding=5, width=150))
+        char_save_button = toga.Button('Save Character Details', on_press=self.save_display_settings, style=Pack(padding=(25,5,0,0), width=150))
         # Create a box to hold the input field and button
         save_char_box = toga.Box(children=[char_save_button])
         appsettings_box.add(save_char_box)
 
+###############################################
 
 
 
+
+        self.rolled_details_header = toga.Label(f"---Text Copy Area for Exporting Stories---", style=Pack(direction=ROW, padding=(10,0,0,250) , alignment=CENTER))
+        self.rolled_details_label = toga.Label(f"Rolled Details:", style=Pack(direction=ROW, padding=(10,35,0,0) , alignment=CENTER))
+        self.rolled_details_TextInput = toga.TextInput(value=self.combined_story, readonly=True, style=Pack(padding=5, width=500))
+
+        rolled_details_box = toga.Box(children=[self.rolled_details_label, self.rolled_details_TextInput])
+        appsettings_box.add(self.rolled_details_header)
+        appsettings_box.add(rolled_details_box)
+
+
+
+        self.cgpt_bio_copy_label = toga.Label(f"ChatGPT Bio:", style=Pack(direction=ROW, padding=(10,42,0,0) , alignment=CENTER))
+        self.cgpt_bio_copy_TextInput = toga.TextInput(value=self.combined_story, readonly=True, style=Pack(padding=5, width=500))
+
+        cgpt_bio_copy_box = toga.Box(children=[self.cgpt_bio_copy_label, self.cgpt_bio_copy_TextInput])
+        appsettings_box.add(cgpt_bio_copy_box)
+
+
+
+        self.cgpt_stat_copy_label = toga.Label(f"ChatGPT Statblock:", style=Pack(direction=ROW, padding=(10,5,0,0) , alignment=CENTER))
+        self.cgpt_stat_copy_TextInput = toga.TextInput(value=self.combined_story, readonly=True, style=Pack(padding=5, width=500))
+
+        cgpt_stat_copy_box = toga.Box(children=[self.cgpt_stat_copy_label, self.cgpt_stat_copy_TextInput])
+        appsettings_box.add(cgpt_stat_copy_box)
+
+
+
+
+###############################################
 
 
 # Create a box for the "Display" option
@@ -493,6 +522,7 @@ class WeckterBackstoryGenerator(toga.App):
             self.character_class_input.value = self.loaded_character_class
 
 
+
 # Add the new box to the "Display" tab
         display_box.add(ally_enemy_name_box)
 # Add the label and text input to the box
@@ -507,6 +537,7 @@ class WeckterBackstoryGenerator(toga.App):
 
 # Create a label to show selected sentences (this will be filled later)
         self.selected_sentences_label = toga.Label(f"{selected_sentences}", style=Pack(padding=(0, 5)))
+
         display_box.add(self.selected_sentences_label)
 
 # Create a label to show chatgpt_bio (this will be filled later)
@@ -537,6 +568,8 @@ class WeckterBackstoryGenerator(toga.App):
         scroll_container_appsettings.content = appsettings_box
 
 
+
+        self.active_scroll_container = None
 
         main_box.add(self.ally_enemy_box)
         self.dice_label = toga.Label('Dice Result: 0', style=big_header_style)
@@ -733,6 +766,7 @@ class WeckterBackstoryGenerator(toga.App):
     def update_combined_story(self, widget=None):
         self.combined_story = f"{self.ally_enemy_label.text}: My character (Name: {self.character_name_input.value}, Race: {self.character_race_input.value}, Class/Profession: {self.character_class_input.value})\n{self.selected_sentences_label.text}"
         print("Updated Combined Story:", self.combined_story)  # For debugging
+        self.rolled_details_TextInput.value = self.combined_story
 
 
 
@@ -752,6 +786,7 @@ class WeckterBackstoryGenerator(toga.App):
         print("Generated Bio:", self.bio)  # You can display this bio in the UI as needed
         wrapped_bio = self.wrap_text(self.bio, 115)
         self.chatgpt_bio_label.text = wrapped_bio
+        self.cgpt_bio_copy_TextInput.value = self.chatgpt_bio_label.text
         print("Current cost basis:", self.aimodel, self.AI_INPUT_COST, self.AI_OUTPUT_COST)
         sent_cost = (self.completion_tokens/1000) * self.AI_INPUT_COST
         received_cost = (self.prompt_tokens/1000) * self.AI_OUTPUT_COST
@@ -766,6 +801,7 @@ class WeckterBackstoryGenerator(toga.App):
         print("Generated Statblock:", enemy_statblock)  # You can display this bio in the UI as needed
         wrapped_statblock = self.wrap_text(enemy_statblock, 115)
         self.statblock_label.text = wrapped_statblock
+        self.cgpt_stat_copy_TextInput.value = self.statblock_label.text
         self.aimodel
         print("Current cost basis:", self.aimodel, self.AI_INPUT_COST, self.AI_OUTPUT_COST)
         sent_cost = (self.completion_tokens/1000) * self.AI_INPUT_COST
@@ -774,8 +810,6 @@ class WeckterBackstoryGenerator(toga.App):
         self.formatted_total_aimessage_cost = "${:.4f}".format(self.total_aimessage_cost)
         print("Message Cost:", self.formatted_total_aimessage_cost)
         self.token_cost_label.text = f"Total cost this session: {self.formatted_total_aimessage_cost}"
-
-
 
 
 def main():
