@@ -1,7 +1,3 @@
-GPT 3.5 = 0.002 per Bio
-GPT 4   = 0.06  per Bio
-
-
 User
 I have description of an enemy of my D and D character. Given this discription, give them a name and a short bio. My character is a half-elf mage named Randalf the Wizened.
 

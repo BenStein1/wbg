@@ -1,5 +1,6 @@
 api_settings:
-  api_key: gAAAAABlJcQ5F2kokbbIq9C_hiqBidwOd3SlfLp_mlPGTF_YLZAa4uEZffINbxtMD8bYcVJ6Ab3XG2L1ZyUeDwYZvYy9Txj_Yiztb5UzkwSd7rFlKrDcE_UcAyjZXxa7uuL8pLStZqXT8G_QNcpuswcdJh2OqjgI9A==
+  ai_model: gpt-3.5-turbo
+  api_key: gAAAAABlJhCBgMSP3xv397tkDoP6VDLIAFmLYK5XtF-8q3zg8y3AgbsTgGS0pU8bAXmZ7ulKjg6pStQF-FzRGKdUnGZGnzxW819Ng1CNjT6ffW4WzHR-nFWMkJJywho_sVQXFasN2ErZbwUPoqkKmmR7tuEb_b7azA==
 character_details:
   class: barbarian
   level: '8'

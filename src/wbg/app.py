@@ -48,11 +48,6 @@ class WeckterBackstoryGenerator(toga.App):
     font_path_bold = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Bold.ttf')
     OPENAI_API_KEY = None
 
-    #def count_tokens(text):
-        #tokenizer = Tokenizer()
-        #enc = tiktoken.get_encoding("cl100k_base") # For cl100k_base: Includes - gpt-4, gpt-3.5-turbo, text-embedding-ada-002
-        #enc = tiktoken.encoding_for_model(AI_MODEL)
-        #return sum(1 for token in tokenizer.tokenize(text))
 
 
     def wrap_text(self, text, max_width):
@@ -122,19 +117,28 @@ class WeckterBackstoryGenerator(toga.App):
         print("Called on_field_focus_change.")
         self.save_display_settings()
 
-    def save_display_settings(self, widget):
+    def save_display_settings(self, widget=None):
         print("Called save_display_settings.")
         # Collect the values from the text input fields
         char_name_value = self.character_name_input.value
         char_level_value = self.character_level_input.value
         char_race_value = self.character_race_input.value
         char_class_value = self.character_class_input.value
+        print("Saving new AI Model:", self.aimodel_selection.value)
+        self.aimodel = self.aimodel_selection.value
 
         try:
             with open(self.settings_yaml_path, 'r') as f:
                 settings = yaml.safe_load(f)
         except FileNotFoundError:
             settings = {}
+
+        if 'api_settings' not in settings:
+            settings['api_settings'] = {}
+            settings['api_settings']['ai_model'] = "gpt-3.5-turbo"
+
+
+        settings['api_settings']['ai_model'] = self.aimodel
 
         if 'character_details' not in settings:
             settings['character_details'] = {}
@@ -146,10 +150,29 @@ class WeckterBackstoryGenerator(toga.App):
         settings['character_details']['race'] = char_race_value
         settings['character_details']['class'] = char_class_value
 
+        if self.aimodel == "gpt-3.5-turbo":
+            input_cost_per_k = 0.0015
+            output_cost_per_k = 0.002
+        elif self.aimodel == "gpt-4":
+            input_cost_per_k = 0.03
+            output_cost_per_k = 0.06
+        else:
+            print("Warning: Unknown AI_MODEL. Using default costs.")
+            input_cost_perk = 0.0015  # Default cost per token for input
+            output_cost_perk = 0.002  # Default cost per token for output
+
+        self.AI_INPUT_COST = input_cost_per_k
+        self.AI_OUTPUT_COST = output_cost_per_k
+
         print("Write character settings.")
         # Write the settings to wbg_settings.yaml
         with open(self.settings_yaml_path, 'w') as f:
             yaml.safe_dump(settings, f)
+
+
+
+
+
 
 
     def load_settings(self):
@@ -163,8 +186,17 @@ class WeckterBackstoryGenerator(toga.App):
 # Decrypt the API key
             cipher_suite = Fernet(decryption_key)
             print(f"load_settings old decryption key:", decryption_key)
-            with open(self.settings_yaml_path, 'r') as f:
-                settings = yaml.safe_load(f)
+# Load existing settings if the YAML file exists
+            try:
+                with open(self.settings_yaml_path, 'r') as f:
+                    settings = yaml.safe_load(f)
+                    if settings is None:
+                        settings = {}
+            except FileNotFoundError:
+                settings = {}
+            if 'api_settings' not in settings:
+                settings['api_settings'] = {}
+
             print("load_settings bit decoding beginning...")
             bit_decoded_encrypted_api_key = settings['api_settings'].get('api_key', '')
 
@@ -191,19 +223,6 @@ class WeckterBackstoryGenerator(toga.App):
             with open(self.settings_yaml_path, 'w') as f:
                 yaml.safe_dump(settings, f)
 
-
-# Load character details if they exist
-            character_details = settings.get('character_details', {})
-
-            if 'name' in character_details:
-                self.loaded_character_name = character_details['name']
-            if 'level' in character_details:
-                self.loaded_character_level = character_details['level']
-            if 'race' in character_details:
-                self.loaded_character_race = character_details['race']
-            if 'class' in character_details:
-                self.loaded_character_class = character_details['class']
-
         except FileNotFoundError:
             print("Settings file or decryption key file not found. Using default settings.")
         except Exception as e:
@@ -217,9 +236,74 @@ class WeckterBackstoryGenerator(toga.App):
 
 
 
+
+
+    def load_regular_settings(self):
+        print(f"Load regular settings:")# Generate a key for encryption
+        try:
+            with open(self.settings_yaml_path, 'r') as f:
+                settings = yaml.safe_load(f)
+# Load character details if they exist
+            print(f"Load character details:")
+            character_details = settings.get('character_details', {})
+
+            if 'name' in character_details:
+                self.loaded_character_name = character_details['name']
+                print(f"Name:", self.loaded_character_name)
+            if 'level' in character_details:
+                self.loaded_character_level = character_details['level']
+                print(f"Level:", self.loaded_character_level)
+            if 'race' in character_details:
+                self.loaded_character_race = character_details['race']
+                print(f"Race:", self.loaded_character_race)
+            if 'class' in character_details:
+                self.loaded_character_class = character_details['class']
+                print(f"Class:", self.loaded_character_class)
+
+            print(f"Attempting AI settings load...")
+            ai_settings = settings.get('api_settings', {})
+
+            if 'ai_model' in ai_settings:
+                if settings['api_settings']['ai_model'] == 'gpt-4':
+                    self.aimodel = 'gpt-4'
+                    print(f"Loaded API model:", self.aimodel)
+                    #self.aimodel_selection.value = aimodel_selection.items.find(name="gpt-4")
+                else:
+                    #self.aimodel_selection.value = aimodel_selection.items.find(name="gpt-3.5-turbo")
+                    self.aimodel = 'gpt-3.5-turbo'
+                    print(f"Loaded AI Model:", self.aimodel)
+            else:
+                ai_settings['ai_model'] = 'gpt-3.5-turbo'
+                print(f"No AI Model Loaded... Using Default:", self.aimodel)
+
+            if self.aimodel == "gpt-3.5-turbo":
+                input_cost_per_k = 0.0015
+                output_cost_per_k = 0.002
+            elif self.aimodel == "gpt-4":
+                input_cost_per_k = 0.03
+                output_cost_per_k = 0.06
+            else:
+                print("Warning: Unknown AI_MODEL. Using default costs.")
+                input_cost_perk = 0.0015  # Default cost per token for input
+                output_cost_perk = 0.002  # Default cost per token for output
+
+            self.AI_INPUT_COST = input_cost_per_k
+            self.AI_OUTPUT_COST = output_cost_per_k
+
+        except FileNotFoundError:
+            print("Settings file or decryption key file not found. Using default settings.")
+        except Exception as e:
+            print(f"An error occurred while loading settings: {e}")
+
+
+
+
+
+
     def startup(self):
 
         self.load_settings()
+        self.load_regular_settings()
         print(f"OPEN_API_KEY:", self.OPENAI_API_KEY)
         toga.Font.register("NotoSansMono", self.font_path)
         toga.Font.register("NotoSansMono", self.font_path_bold, weight=BOLD)
@@ -258,6 +342,8 @@ class WeckterBackstoryGenerator(toga.App):
         self.temperament_selected = None
         self.combined_story = ""
         self.token_count = None
+        self.total_aimessage_cost = 0
+
 
 
 
@@ -337,16 +423,22 @@ class WeckterBackstoryGenerator(toga.App):
 # Create a button to save the API key
         save_button = toga.Button('Save', on_press=self.save_api_key, style=Pack(padding=5, width=150))
                 # Create a box to hold the input field and button
-        self.api_key_label = toga.Label('OpenAI API Key', style=Pack(direction=ROW, padding=10, alignment=CENTER))
+        self.api_key_label = toga.Label('OpenAI API Key:', style=Pack(direction=ROW, padding=10, alignment=CENTER))
         self.ai_keywarn_label = toga.Label('Enter an OpenAI API Key to enable ChatGPT features.\n https://platform.openai.com/account/api-keys', style=Pack(direction=ROW, padding=3, alignment=CENTER))
         apibox = toga.Box(children=[self.api_key_label, self.api_key_input, save_button, self.ai_keywarn_label])
         appsettings_box.add(apibox)
 
+        self.aimodel_selection = toga.Selection(items=["gpt-3.5-turbo", "gpt-4"], on_select=self.on_field_focus_change, style=Pack(padding=3, width=150))
+        self.aimodel_selection.value = self.aimodel
 
-        #self.token_count_label = toga.Label('OpenAI Token Count: 0', style=Pack(direction=ROW, padding=10, alignment=CENTER))
-        #appsettings_box.add(self.token_count_label)
-        #self.token_count = count_tokens(text)
-        #print(f"Token count: {self.token_count}")
+        self.aimodel_label = toga.Label('Select AI Model:', style=Pack(direction=ROW, padding=10, alignment=CENTER))
+        self.aimodel_cost_label = toga.Label('GPT 3.5 ~ $0.002 per Bio\nGPT 4    ~ $0.06  per Bio', style=Pack(direction=ROW, padding=3, alignment=CENTER))
+        self.formatted_total_aimessage_cost = "${:.4f}".format(self.total_aimessage_cost)
+        self.token_cost_label = toga.Label('Cost this session: $0.00', style=Pack(direction=ROW, padding=(10,0,0,20) , alignment=CENTER))
+        self.token_cost_label.text = self.formatted_total_aimessage_cost
+        aimodel_box = toga.Box(children=[self.aimodel_label, self.aimodel_selection, self.aimodel_cost_label, self.token_cost_label])
+        appsettings_box.add(aimodel_box)
+
 
 
         char_save_button = toga.Button('Save Character Details', on_press=self.save_display_settings, style=Pack(padding=5, width=150))
@@ -373,22 +465,22 @@ class WeckterBackstoryGenerator(toga.App):
 
         self.character_name_label = toga.Label('Character Name', style=Pack(alignment=CENTER))
         self.character_name_input = toga.TextInput(placeholder='Enter D&D character name', style=Pack(padding=5, width=275))
-        #self.character_name_input.on_lose_focus = self.on_field_focus_change()
+
         self.character_name_box = toga.Box(children=[self.character_name_label, self.character_name_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
         self.character_level_label = toga.Label('Level', style=Pack(alignment=CENTER))
         self.character_level_input = toga.NumberInput(min_value=1, value=1, step=1, style=Pack(padding=5))
-        #self.character_level_input.on_lose_focus = self.on_field_focus_change()
+
         self.character_level_box = toga.Box(children=[self.character_level_label, self.character_level_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
         self.character_race_label = toga.Label('Character Race', style=Pack(alignment=CENTER))
         self.character_race_input = toga.TextInput(placeholder='Enter D&D character race', style=Pack(padding=(0, 5, 0, 25), width=175))
-        #self.character_race_input.on_lose_focus = self.on_field_focus_change()
+
         self.character_race_box = toga.Box(children=[self.character_race_label, self.character_race_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
         self.character_class_label = toga.Label('Character Class', style=Pack(alignment=CENTER))
         self.character_class_input = toga.TextInput(placeholder='Enter D&D character class', style=Pack(padding=5, width=175))
-        #self.character_class_input.on_lose_focus = self.on_field_focus_change()
+
         self.character_class_box = toga.Box(children=[self.character_class_label, self.character_class_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
         if self.loaded_character_name:
@@ -656,18 +748,32 @@ class WeckterBackstoryGenerator(toga.App):
 
     def generate_chatgpt_bio(self, widget):
 # Call the aiprompt.generate_bio method with the combined_story
-        self.bio = ai.generate_bio(self.combined_story, self.OPENAI_API_KEY)
+        self.bio, self.completion_tokens, self.prompt_tokens = ai.generate_bio(self.combined_story, self.OPENAI_API_KEY, self.aimodel)
         print("Generated Bio:", self.bio)  # You can display this bio in the UI as needed
         wrapped_bio = self.wrap_text(self.bio, 115)
         self.chatgpt_bio_label.text = wrapped_bio
+        print("Current cost basis:", self.aimodel, self.AI_INPUT_COST, self.AI_OUTPUT_COST)
+        sent_cost = (self.completion_tokens/1000) * self.AI_INPUT_COST
+        received_cost = (self.prompt_tokens/1000) * self.AI_OUTPUT_COST
+        self.total_aimessage_cost += sent_cost + received_cost
+        self.formatted_total_aimessage_cost = "${:.4f}".format(self.total_aimessage_cost)
+        print("Message Cost:", self.formatted_total_aimessage_cost)
+        self.token_cost_label.text = f"Total cost this session: {self.formatted_total_aimessage_cost}"
 
     def generate_statblock(self, widget):
 # Call the aiprompt.generate_bio method with the combined_story
-        enemy_statblock = aistatblock.generate_statblock(self.bio, self.character_level_input.value, self.OPENAI_API_KEY)
+        enemy_statblock, self.completion_tokens, self.prompt_tokens = aistatblock.generate_statblock(self.bio, self.character_level_input.value, self.OPENAI_API_KEY, self.aimodel)
         print("Generated Statblock:", enemy_statblock)  # You can display this bio in the UI as needed
         wrapped_statblock = self.wrap_text(enemy_statblock, 115)
         self.statblock_label.text = wrapped_statblock
-
+        self.aimodel
+        print("Current cost basis:", self.aimodel, self.AI_INPUT_COST, self.AI_OUTPUT_COST)
+        sent_cost = (self.completion_tokens/1000) * self.AI_INPUT_COST
+        received_cost = (self.prompt_tokens/1000) * self.AI_OUTPUT_COST
+        self.total_aimessage_cost += sent_cost + received_cost
+        self.formatted_total_aimessage_cost = "${:.4f}".format(self.total_aimessage_cost)
+        print("Message Cost:", self.formatted_total_aimessage_cost)
+        self.token_cost_label.text = f"Total cost this session: {self.formatted_total_aimessage_cost}"
 
 
 

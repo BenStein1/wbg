@@ -10,21 +10,21 @@ from pathlib import Path
 
 
 # OpenAI
-#AI_MODEL = "gpt-3.5-turbo"
-AI_MODEL = "gpt-4"
+AI_MODEL = "gpt-3.5-turbo"
+#AI_MODEL = "gpt-4"
 if AI_MODEL == "gpt-3.5-turbo":
-    input_cost_perk = 0.0015
-    output_cost_perk = 0.002
+    input_cost_per_k = 0.0015
+    output_cost_per_k = 0.002
 elif AI_MODEL == "gpt-4":
-    input_cost_perk = 0.03
-    output_cost_perk = 0.06
+    input_cost_per_k = 0.03
+    output_cost_per_k = 0.06
 else:
     print("Warning: Unknown AI_MODEL. Using default costs.")
     input_cost_perk = 0.0015  # Default cost per token for input
     output_cost_perk = 0.002  # Default cost per token for output
 
-AI_INPUT_COST = input_cost_perk
-AI_OUTPUT_COST = output_cost_perk
+AI_INPUT_COST = input_cost_per_k
+AI_OUTPUT_COST = output_cost_per_k
 
 
 # Costs As of 10/10/23 - https://openai.com/pricing
