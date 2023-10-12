@@ -23,8 +23,9 @@ test_sources = [
 
 requires = [
     "requests==2.31.0",
-    "cryptography>=3.4",
+    "cryptography",
     "PyYAML>=5.4",
+    "toga"
 ]
 test_requires = [
     "pytest",
@@ -110,9 +111,9 @@ manylinux = "manylinux2014"
 
 system_requires = [
     # Needed to compile pycairo wheel
-    "cairo-gobject-devel",
+    #"cairo-gobject-devel",
     # Needed to compile PyGObject wheel
-    "gobject-introspection-devel",
+    #"gobject-introspection-devel",
     # Needed to provide GTK
     "gtk3-devel",
     # Dependencies that GTK looks for at runtime, that need to be
@@ -129,6 +130,7 @@ linuxdeploy_plugins = [
 flatpak_runtime = "org.gnome.Platform"
 flatpak_runtime_version = "44"
 flatpak_sdk = "org.gnome.Sdk"
+
 
 [tool.briefcase.app.wbg.windows]
 requires = [

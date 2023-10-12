@@ -6,35 +6,17 @@ import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
 from toga.style.pack import BOLD, CENTER
+import cryptography
 from cryptography.fernet import Fernet
 import base64
 import random
 import yaml
+import platform
 import os
-from .supportfiles.config import (
-    AI_MODEL
-)
+
 
 from .supportfiles import aiprompt as ai
 from .supportfiles import aistatblock
-
-class CustomLabelBox(toga.Box):
-    def __init__(self, label_text, box_content, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.label = toga.Label(label_text, style=Pack(alignment=CENTER))
-        self.box = toga.Box(children=[box_content])
-
-        self.add(self.label)
-        self.add(self.box)
-
-        self.style.update(direction=COLUMN, alignment=CENTER)
-
-    def update_label(self, new_text):
-        self.label.text = new_text
-
-    def get_label_text(self):
-        return self.label.text
 
 
 
@@ -48,6 +30,10 @@ class WeckterBackstoryGenerator(toga.App):
     font_path_bold = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Bold.ttf')
     OPENAI_API_KEY = None
 
+    def disable_method(func):
+        def wrapper(*args, **kwargs):
+            print(f"Method {func.__name__} is disabled for testing.")
+        return wrapper
 
 
     def wrap_text(self, text, max_width):
@@ -73,6 +59,7 @@ class WeckterBackstoryGenerator(toga.App):
 
 
 # Function to save the API key
+
     def save_api_key(self, widget):
         print(f"save_api_key retrieve new encryption key:", self.encryption_key)  # Debug print statement#key = Fernet.generate_key()  # Generate a key for encryption
         cipher_suite = Fernet(self.encryption_key)
@@ -113,9 +100,11 @@ class WeckterBackstoryGenerator(toga.App):
         print("Called on_text_change.")
         self.save_display_settings()
 
+
     def on_field_focus_change(self, widget):
         print("Called on_field_focus_change.")
         self.save_display_settings()
+
 
     def save_display_settings(self, widget=None):
         print("Called save_display_settings.")
@@ -150,16 +139,18 @@ class WeckterBackstoryGenerator(toga.App):
         settings['character_details']['race'] = char_race_value
         settings['character_details']['class'] = char_class_value
 
-        if self.aimodel == "gpt-3.5-turbo":
-            input_cost_per_k = 0.0015
-            output_cost_per_k = 0.002
-        elif self.aimodel == "gpt-4":
+        if self.aimodel == "gpt-4":
             input_cost_per_k = 0.03
             output_cost_per_k = 0.06
+        elif self.aimodel == "gpt-3.5-turbo":
+            input_cost_per_k = 0.0015
+            output_cost_per_k = 0.002
         else:
-            print("Warning: Unknown AI_MODEL. Using default costs.")
+            print("Warning: Unknown AI_MODEL. Using default costs/model.")
+            self.aimodel = "gpt-3.5-turbo"
             input_cost_perk = 0.0015  # Default cost per token for input
             output_cost_perk = 0.002  # Default cost per token for output
+
 
         self.AI_INPUT_COST = input_cost_per_k
         self.AI_OUTPUT_COST = output_cost_per_k
@@ -284,14 +275,15 @@ class WeckterBackstoryGenerator(toga.App):
                 ai_settings['ai_model'] = 'gpt-3.5-turbo'
                 print(f"No AI Model Loaded... Using Default:", self.aimodel)
 
-            if self.aimodel == "gpt-3.5-turbo":
-                input_cost_per_k = 0.0015
-                output_cost_per_k = 0.002
-            elif self.aimodel == "gpt-4":
+            if self.aimodel == "gpt-4":
                 input_cost_per_k = 0.03
                 output_cost_per_k = 0.06
+            elif self.aimodel == "gpt-3.5-turbo":
+                input_cost_per_k = 0.0015
+                output_cost_per_k = 0.002
             else:
-                print("Warning: Unknown AI_MODEL. Using default costs.")
+                print("Warning: Unknown AI_MODEL. Using default costs/model.")
+                self.aimodel = "gpt-3.5-turbo"
                 input_cost_perk = 0.0015  # Default cost per token for input
                 output_cost_perk = 0.002  # Default cost per token for output
 
@@ -302,8 +294,6 @@ class WeckterBackstoryGenerator(toga.App):
             print("Settings file or decryption key file not found. Using default settings.")
         except Exception as e:
             print(f"An error occurred while loading settings: {e}")
-
-
 
 
 
@@ -323,6 +313,7 @@ class WeckterBackstoryGenerator(toga.App):
             font_size=20,
             font_weight=BOLD,
             alignment=CENTER
+            #width=400
         )
 
         header_style = Pack(
@@ -331,6 +322,7 @@ class WeckterBackstoryGenerator(toga.App):
             font_size=15,
             font_weight=BOLD,
             alignment=CENTER
+            #width=400
         )
 
         roll_label_style = Pack(
@@ -341,6 +333,7 @@ class WeckterBackstoryGenerator(toga.App):
             height=20,
             padding_top=5,
             padding_bottom=0
+            #width=400
         )
 
 
@@ -352,6 +345,11 @@ class WeckterBackstoryGenerator(toga.App):
         self.token_count = None
         self.total_aimessage_cost = 0
 
+
+        def disable_method(func):
+            def wrapper(*args, **kwargs):
+                print(f"Method {func.__name__} is disabled for testing.")
+            return wrapper
 
 
 
@@ -432,11 +430,11 @@ class WeckterBackstoryGenerator(toga.App):
                 # Create a box to hold the input field and button
         self.api_key_label = toga.Label('OpenAI API Key:', style=Pack(direction=ROW, padding=10, alignment=CENTER))
         self.ai_keywarn_label = toga.Label('Enter an OpenAI API Key to enable ChatGPT features.\n https://platform.openai.com/account/api-keys', style=Pack(direction=ROW, padding=3, alignment=CENTER))
-        apibox = toga.Box(children=[self.api_key_label, self.api_key_input, save_button, self.ai_keywarn_label])
+        apibox = toga.Box(children=[self.api_key_label, self.api_key_input, save_button])
         appsettings_box.add(apibox)
 
         self.aimodel_selection = toga.Selection(items=["gpt-3.5-turbo", "gpt-4"], on_select=self.on_field_focus_change, style=Pack(padding=3, width=150))
-        self.aimodel_selection.value = self.aimodel
+
 
         self.aimodel_label = toga.Label('Select AI Model:', style=Pack(direction=ROW, padding=10, alignment=CENTER))
         self.aimodel_cost_label = toga.Label('GPT 3.5 ~ $0.002 per Bio\nGPT 4    ~ $0.06  per Bio', style=Pack(direction=ROW, padding=3, alignment=CENTER))
@@ -482,6 +480,8 @@ class WeckterBackstoryGenerator(toga.App):
         cgpt_stat_copy_box = toga.Box(children=[self.cgpt_stat_copy_label, self.cgpt_stat_copy_TextInput])
         appsettings_box.add(cgpt_stat_copy_box)
 
+        appsettings_box.add(self.ai_keywarn_label)
+
 
 
 
@@ -493,6 +493,7 @@ class WeckterBackstoryGenerator(toga.App):
 
 # Create a box for the new 'Ally of'/'Enemy of' label and text box
         ally_enemy_name_box = toga.Box(style=Pack(direction=ROW, padding=5, alignment=CENTER))
+        ally_enemy_name_box2 = toga.Box(style=Pack(direction=ROW, padding=5, alignment=CENTER))
 
 
 # Create a text input for the D&D character name
@@ -511,7 +512,7 @@ class WeckterBackstoryGenerator(toga.App):
         self.character_level_box = toga.Box(children=[self.character_level_label, self.character_level_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
         self.character_race_label = toga.Label('Character Race', style=Pack(alignment=CENTER))
-        self.character_race_input = toga.TextInput(placeholder='Enter D&D character race', style=Pack(padding=(0, 5, 0, 25), width=175))
+        self.character_race_input = toga.TextInput(placeholder='Enter D&D character race', style=Pack(padding=(0, 5, 0, 0), width=175))#old padding padding=(0, 5, 0, 25)
 
         self.character_race_box = toga.Box(children=[self.character_race_label, self.character_race_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
@@ -520,25 +521,16 @@ class WeckterBackstoryGenerator(toga.App):
 
         self.character_class_box = toga.Box(children=[self.character_class_label, self.character_class_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
-        if self.loaded_character_name:
-            self.character_name_input.value = self.loaded_character_name
-        if self.loaded_character_level:
-            self.character_level_input.value = self.loaded_character_level
-        if self.loaded_character_race:
-            self.character_race_input.value = self.loaded_character_race
-        if self.loaded_character_class:
-            self.character_class_input.value = self.loaded_character_class
-
-
 
 # Add the new box to the "Display" tab
         display_box.add(ally_enemy_name_box)
+        display_box.add(ally_enemy_name_box2)
 # Add the label and text input to the box
         ally_enemy_name_box.add(self.al_en_box)
         ally_enemy_name_box.add(self.character_name_box)
         ally_enemy_name_box.add(self.character_level_box)
-        ally_enemy_name_box.add(self.character_race_box)
-        ally_enemy_name_box.add(self.character_class_box)
+        ally_enemy_name_box2.add(self.character_race_box)
+        ally_enemy_name_box2.add(self.character_class_box)
 
         self.bio = ""
         self.statblock = ""
@@ -610,15 +602,40 @@ class WeckterBackstoryGenerator(toga.App):
         option_container.add("Settings", scroll_container_appsettings)
 
 # Set the OptionContainer as the main window content
-        self.main_window = toga.MainWindow(title=self.formal_name,size=(750, 1334))
+        self.main_window = toga.MainWindow(title=self.formal_name,size=(430, 932))
         self.main_window.content = option_container
 
+######SET VALUES######
 
         self.main_window.show()
 
+        if not hasattr(self, 'aimodel'):
+            print("Warning: Unknown AI_MODEL. Using default costs/model.")
+            self.aimodel = "gpt-3.5-turbo"
+            input_cost_perk = 0.0015
+            output_cost_perk = 0.002
+
+
+
+        self.aimodel_selection.value = self.aimodel
         self.character_name_input.on_change = self.update_combined_story
         self.character_race_input.on_change = self.update_combined_story
         self.character_class_input.on_change = self.update_combined_story
+
+        if hasattr(self, 'loaded_character_name'):
+            if self.loaded_character_name:
+                self.character_name_input.value = self.loaded_character_name
+        if hasattr(self, 'loaded_character_level'):
+            if self.loaded_character_level:
+                self.character_level_input.value = self.loaded_character_level
+        if hasattr(self, 'loaded_character_race'):
+            if self.loaded_character_race:
+                self.character_race_input.value = self.loaded_character_race
+        if hasattr(self, 'loaded_character_class'):
+            if self.loaded_character_class:
+                self.character_class_input.value = self.loaded_character_class
+
+######SET VALUES######
 
         for category, sub_categories_and_rolls in self.data['AllyEnemyTables'].items():
 #print("sub_categories_and_rolls:", sub_categories_and_rolls)
@@ -628,8 +645,12 @@ class WeckterBackstoryGenerator(toga.App):
             roll_label = toga.Label("", style=roll_label_style)
             category_and_roll_box = toga.Box(style=Pack(padding=(0, 0), direction=COLUMN, alignment=CENTER))
 
-            if len(str(category)) < 45:
-                diff = 45 - len(str(category))
+            if platform.system() == "Darwin":
+                wrap_value = 1
+            else:
+                wrap_value = 45
+            if len(str(category)) < wrap_value:
+                diff = wrap_value - len(str(category))
                 padding = ' ' * (diff // 2)
 
 # If the difference is odd, add one more space at the end
@@ -682,6 +703,11 @@ class WeckterBackstoryGenerator(toga.App):
         scroll_container = toga.ScrollContainer(horizontal=False, vertical=True)
 
 
+    def disable_method(func):
+        def wrapper(*args, **kwargs):
+            print(f"Method {func.__name__} is disabled for testing.")
+        return wrapper
+
 
 
     def roll_dice(self, widget):
@@ -694,6 +720,7 @@ class WeckterBackstoryGenerator(toga.App):
             num_rolls = sub_categories_and_rolls['rolls']
             roll_label = toga.Label("", style=Pack(padding=(0, 10), font_family="NotoSansMono", font_size=15))
             self.roll_dice_for_category(category, roll_label, num_rolls)(widget)
+
 
     def roll_dice_for_category(self, category, roll_label, num_rolls=1):
         def _inner_roll(widget):
@@ -738,6 +765,7 @@ class WeckterBackstoryGenerator(toga.App):
             self.update_selected_sentences()
 
         return _inner_roll
+
 
     def update_selected_sentences(self):
         print("update_selected_sentences is called!")
@@ -802,6 +830,8 @@ class WeckterBackstoryGenerator(toga.App):
         self.formatted_total_aimessage_cost = "${:.4f}".format(self.total_aimessage_cost)
         print("Message Cost:", self.formatted_total_aimessage_cost)
         self.token_cost_label.text = f"Total cost this session: {self.formatted_total_aimessage_cost}"
+
+
 
     def generate_statblock(self, widget):
 # Call the aiprompt.generate_bio method with the combined_story
