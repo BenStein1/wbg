@@ -24,7 +24,7 @@ from .supportfiles import aistatblock
 class WeckterBackstoryGenerator(toga.App):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     yaml_path = os.path.join(current_dir, 'supportfiles', 'AllyEnemyTables.yaml')
-    keyfile_path = os.path.join(current_dir, 'resources', 'wbg.tif')
+    keyfile_path = os.path.join(current_dir, 'supportfiles', 'wbg.tif')
     settings_yaml_path = os.path.join(current_dir, 'supportfiles', 'wbg_settings.yaml')
     font_path = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Regular.ttf')
     font_path_bold = os.path.join(current_dir, 'supportfiles', 'fonts', 'noto', 'NotoSansMono-Bold.ttf')
@@ -316,14 +316,23 @@ class WeckterBackstoryGenerator(toga.App):
             #width=400
         )
 
-        header_style = Pack(
-            padding=(5, 0),
-            font_family="NotoSansMono",
-            font_size=15,
-            font_weight=BOLD,
-            alignment=CENTER
-            #width=400
-        )
+        if platform.system() == "Darwin":
+            header_style = Pack(
+                padding=(5, 0),
+                font_family="NotoSansMono",
+                font_size=15,
+                font_weight=BOLD,
+                alignment=CENTER,
+                width=350
+            )
+        else:
+            header_style = Pack(
+                padding=(5, 0),
+                font_family="NotoSansMono",
+                font_size=15,
+                font_weight=BOLD,
+                alignment=CENTER
+            )
 
         roll_label_style = Pack(
             padding=(0, 10),
@@ -417,7 +426,7 @@ class WeckterBackstoryGenerator(toga.App):
 
 # Create a text input box for the API key
 
-        self.api_key_input = toga.PasswordInput(placeholder='Enter OpenAI API Key', style=Pack(padding=5, width=300))
+        self.api_key_input = toga.PasswordInput(placeholder='Enter OpenAI API Key', style=Pack(padding=5, width=250))
 #Turn OpenAI Options on if API key filled in and fill in box
         if self.OPENAI_API_KEY:
             self.api_key_input.value = self.OPENAI_API_KEY
@@ -426,23 +435,26 @@ class WeckterBackstoryGenerator(toga.App):
 
 # Add items to Settings tab
 # Create a button to save the API key
-        save_button = toga.Button('Save', on_press=self.save_api_key, style=Pack(padding=5, width=150))
+        save_button = toga.Button('Save API Key', on_press=self.save_api_key, style=Pack(padding=5, width=150))
                 # Create a box to hold the input field and button
         self.api_key_label = toga.Label('OpenAI API Key:', style=Pack(direction=ROW, padding=10, alignment=CENTER))
         self.ai_keywarn_label = toga.Label('Enter an OpenAI API Key to enable ChatGPT features.\n https://platform.openai.com/account/api-keys', style=Pack(direction=ROW, padding=3, alignment=CENTER))
-        apibox = toga.Box(children=[self.api_key_label, self.api_key_input, save_button])
+        apibox = toga.Box(children=[self.api_key_label, self.api_key_input])
         appsettings_box.add(apibox)
+        appsettings_box.add(save_button)
 
-        self.aimodel_selection = toga.Selection(items=["gpt-3.5-turbo", "gpt-4"], on_select=self.on_field_focus_change, style=Pack(padding=3, width=150))
+        self.aimodel_selection = toga.Selection(items=["gpt-3.5-turbo", "gpt-4"], on_select=self.on_field_focus_change, style=Pack(padding=5, width=150))
 
 
         self.aimodel_label = toga.Label('Select AI Model:', style=Pack(direction=ROW, padding=10, alignment=CENTER))
-        self.aimodel_cost_label = toga.Label('GPT 3.5 ~ $0.002 per Bio\nGPT 4    ~ $0.06  per Bio', style=Pack(direction=ROW, padding=3, alignment=CENTER))
+        self.aimodel_cost_label = toga.Label('GPT 3.5 ~ $0.002 per Bio\nGPT 4    ~ $0.06  per Bio', style=Pack(direction=ROW, padding=5, alignment=CENTER))
         self.formatted_total_aimessage_cost = "${:.4f}".format(self.total_aimessage_cost)
         self.token_cost_label = toga.Label('Cost this session: $0.00', style=Pack(direction=ROW, padding=(10,0,0,20) , alignment=CENTER))
-        self.token_cost_label.text = self.formatted_total_aimessage_cost
-        aimodel_box = toga.Box(children=[self.aimodel_label, self.aimodel_selection, self.aimodel_cost_label, self.token_cost_label])
+        #self.token_cost_label.text = self.formatted_total_aimessage_cost
+        aimodel_box = toga.Box(children=[self.aimodel_label, self.aimodel_selection])
         appsettings_box.add(aimodel_box)
+        appsettings_box.add(self.aimodel_cost_label)
+        appsettings_box.add(self.token_cost_label)
 
 
 
@@ -456,9 +468,9 @@ class WeckterBackstoryGenerator(toga.App):
 
 
 
-        self.rolled_details_header = toga.Label(f"---Text Copy Area for Exporting Stories---", style=Pack(direction=ROW, padding=(10,0,0,250) , alignment=CENTER))
-        self.rolled_details_label = toga.Label(f"Rolled Details:", style=Pack(direction=ROW, padding=(10,35,0,0) , alignment=CENTER))
-        self.rolled_details_TextInput = toga.TextInput(value=self.combined_story, readonly=True, style=Pack(padding=5, width=500))
+        self.rolled_details_header = toga.Label(f"---Text Copy Area for Exporting Stories---", style=Pack(direction=ROW, padding=(10,0,0,115) , alignment=CENTER))
+        self.rolled_details_label = toga.Label(f"Rolled Details:", style=Pack(direction=ROW, padding=(10,12,0,0) , alignment=CENTER))
+        self.rolled_details_TextInput = toga.TextInput(value=self.combined_story, readonly=True, style=Pack(padding=5, width=275))
 
         rolled_details_box = toga.Box(children=[self.rolled_details_label, self.rolled_details_TextInput])
         appsettings_box.add(self.rolled_details_header)
@@ -466,16 +478,16 @@ class WeckterBackstoryGenerator(toga.App):
 
 
 
-        self.cgpt_bio_copy_label = toga.Label(f"ChatGPT Bio:", style=Pack(direction=ROW, padding=(10,42,0,0) , alignment=CENTER))
-        self.cgpt_bio_copy_TextInput = toga.TextInput(value=self.combined_story, readonly=True, style=Pack(padding=5, width=500))
+        self.cgpt_bio_copy_label = toga.Label(f"ChatGPT Bio:", style=Pack(direction=ROW, padding=(10,17,0,0) , alignment=CENTER))
+        self.cgpt_bio_copy_TextInput = toga.TextInput(value=self.combined_story, readonly=True, style=Pack(padding=5, width=275))
 
         cgpt_bio_copy_box = toga.Box(children=[self.cgpt_bio_copy_label, self.cgpt_bio_copy_TextInput])
         appsettings_box.add(cgpt_bio_copy_box)
 
 
 
-        self.cgpt_stat_copy_label = toga.Label(f"ChatGPT Statblock:", style=Pack(direction=ROW, padding=(10,5,0,0) , alignment=CENTER))
-        self.cgpt_stat_copy_TextInput = toga.TextInput(value=self.combined_story, readonly=True, style=Pack(padding=5, width=500))
+        self.cgpt_stat_copy_label = toga.Label(f"ChatGPT Stats:", style=Pack(direction=ROW, padding=(10,5,0,0) , alignment=CENTER))
+        self.cgpt_stat_copy_TextInput = toga.TextInput(value=self.combined_story, readonly=True, style=Pack(padding=5, width=275))
 
         cgpt_stat_copy_box = toga.Box(children=[self.cgpt_stat_copy_label, self.cgpt_stat_copy_TextInput])
         appsettings_box.add(cgpt_stat_copy_box)
@@ -502,7 +514,7 @@ class WeckterBackstoryGenerator(toga.App):
         self.al_en_box = toga.Box(children=[self.ally_enemy_header, self.ally_enemy_label], style=Pack(direction=COLUMN, alignment=CENTER))
 
         self.character_name_label = toga.Label('Character Name', style=Pack(alignment=CENTER))
-        self.character_name_input = toga.TextInput(placeholder='Enter D&D character name', style=Pack(padding=5, width=275))
+        self.character_name_input = toga.TextInput(placeholder='Enter RPG character name', style=Pack(padding=5, width=225))
 
         self.character_name_box = toga.Box(children=[self.character_name_label, self.character_name_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
@@ -512,7 +524,7 @@ class WeckterBackstoryGenerator(toga.App):
         self.character_level_box = toga.Box(children=[self.character_level_label, self.character_level_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
         self.character_race_label = toga.Label('Character Race', style=Pack(alignment=CENTER))
-        self.character_race_input = toga.TextInput(placeholder='Enter D&D character race', style=Pack(padding=(0, 5, 0, 0), width=175))#old padding padding=(0, 5, 0, 25)
+        self.character_race_input = toga.TextInput(placeholder='Enter RPG character race', style=Pack(padding=(0, 5, 0, 0), width=175))#old padding padding=(0, 5, 0, 25)
 
         self.character_race_box = toga.Box(children=[self.character_race_label, self.character_race_input], style=Pack(direction=COLUMN, alignment=CENTER))
 
@@ -596,7 +608,7 @@ class WeckterBackstoryGenerator(toga.App):
         option_container.add("ChatGPT Bio", scroll_container_chatgpt)
 
 # Add the new 'ChatGPT Statblock' tab and its contents (now wrapped in a ScrollContainer)
-        option_container.add("ChatGPT Statblock", scroll_container_statblock)
+        option_container.add("ChatGPT Stats", scroll_container_statblock)
 
 # Add the new 'Settings' tab and its contents (now wrapped in a ScrollContainer)
         option_container.add("Settings", scroll_container_appsettings)
@@ -690,7 +702,7 @@ class WeckterBackstoryGenerator(toga.App):
 
                 choices, description = data['choices'], data['description']
                 replaced_description = description.replace('{{temperament}}', choices[1] if is_enemy else choices[0])
-                wrapped_description = self.wrap_text(replaced_description, 75)
+                wrapped_description = self.wrap_text(replaced_description, 45)
 
                 self.selected_sentences.append(replaced_description)
 
